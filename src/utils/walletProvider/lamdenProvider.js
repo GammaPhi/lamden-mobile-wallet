@@ -11,7 +11,7 @@ export function sendTransaction(
                     contractName,
                     methodName,
                     kwargs,
-                    stampLimit, 
+                    stampLimit,
                     callback) {
     let wallet = get(storedWallet);
     let network = get(networkInfo).network;
@@ -29,9 +29,24 @@ export function sendTransaction(
     console.log(txInfo);
     let tx = new Lamden.TransactionBuilder(network, txInfo);
     tx.events.on('response', (response) => {
+
         if (callback) {
             callback(response, tx);
         }
     })
     tx.send(wallet.sk).then(() => tx.checkForTransactionResult())
 };
+
+export function sendTransactionResponse(message, origin) {
+    if (window.opener) {
+        let targetWindow = window.opener;
+        console.log("Sending response to window opener.");
+        console.log(message);
+        targetWindow.postMessage({
+            jsonrpc: '2.0',
+            ...message
+        }, origin);
+    } else {
+        console.log("No window opener found.");
+    }
+}
