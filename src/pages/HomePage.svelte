@@ -43,7 +43,25 @@ loggedInEvent.on('loggedIn', () => {
             console.log(tx);
             history.pushState({}, '', '/');
             sendTransactionResponse(
-                tx,
+                {
+                    errors: tx.errors,
+                    resultInfo: tx.resultInfo,
+                    txBlockResult: tx.txBlockResult,
+                    txSendResult: tx.txSendResult,
+                    txCheckResult: tx.txCheckResult,
+                    nonceResult: tx.nonceResult,
+                    sortedPayload: tx.sortedPayload,
+                    payload: tx.payload,
+                    sender: tx.sender,
+                    method: tx.method,
+                    online: tx.online,
+                    stampLimit: tx.stampLimit,
+                    transactionSigned: tx.transactionSigned,
+                    txCheckAttempts: tx.txCheckAttempts,
+                    txCheckLimit: tx.txCheckLimit,
+                    type: tx.type,
+                    name: tx.name,
+                },
                 params.origin
             );
             if (tx.resultInfo.type === 'error') {
