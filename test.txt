@@ -1,0 +1,1 @@
+http://localhost:5000?contractName=currency&methodName=approve&stampLimit=200&kwargs=%7B%22to%22%3A%22con_something%22%2C%22amount%22%3A10%7D

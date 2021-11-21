@@ -4,7 +4,7 @@ export const mainnet = {
     addressExplorer: "https://mainnet.lamden.io/addresses",
     network: {
         "name": "Lamden Mainnet", 
-        "hosts": ["http://localhost:3000"], //["https://masternode-01.lamden.io"],
+        "hosts": ["http://34.133.66.121:3000"], //["https://masternode-01.lamden.io"],
         "type": "mainnet", 
         "lamden": true, 
         "currencySymbol": "TAU",
@@ -18,7 +18,7 @@ export const testnet = {
 
     network: {
         "name": "Lamden Testnet", 
-        "hosts": ["http://localhost:3000"],//["https://testnet-master-1.lamden.io"], 
+        "hosts": ["http://34.133.66.121:3000"],//["https://testnet-master-1.lamden.io"], 
         "type": "testnet", 
         "lamden": true, 
         "currencySymbol": "dTAU",

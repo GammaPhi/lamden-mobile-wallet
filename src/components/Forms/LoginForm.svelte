@@ -23,6 +23,7 @@ const submit = () => {
         autoComplete="current-password"
         value={$password}
         onClick={password.set}
+        onEnterButton={(e)=>{password.set(e); submit();}}
     />
     </Container>
     <Container>

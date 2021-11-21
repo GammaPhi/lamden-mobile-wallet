@@ -15,13 +15,6 @@ let errors = writable([]);
 const logout = () => {
     lockWallet();
 }
-// test 
-let kwargs = {
-    to: "con_something",
-    amount: 10
-}
-let testUrl = "http://localhost:5000?contractName=currency&methodName=approve&stampLimit=200&kwargs="+encodeURIComponent(JSON.stringify(kwargs));
-console.log(testUrl);
 
 loggedInEvent.on('loggedIn', () => {
     const params = parseParams(window.location.search);
@@ -32,7 +25,7 @@ loggedInEvent.on('loggedIn', () => {
         && params.kwargs
         && params.stampLimit
     ) {
-        let network = params.network || "testnet";
+        let network = params.network || $selectedNetwork;
         selectedNetwork.set(network);
 
         const callback = (response, tx) => {
