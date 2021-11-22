@@ -103,12 +103,13 @@ const approve = () => {
         let baseOrigin = extractBaseUrlFromOrigin(params.origin);
         console.log("Base origin: "+baseOrigin);
         const shouldAutoApproveHash = getShouldAutoApproveHash();
-        console.log("Before: "+JSON.stringify(shouldAutoApproveHash));
+        console.log(shouldAutoApproveHash);
         if ($autoConfirm) {
+            console.log("Autoconfirming...");
             shouldAutoApproveHash[baseOrigin] = true;
             setShouldAutoApproveHash(shouldAutoApproveHash);
         }
-        console.log("After: "+JSON.stringify(shouldAutoApproveHash));
+        console.log(shouldAutoApproveHash);
         sendTransactionResponse(
             {"vk": $storedWallet.vk, "type": "vk"},
             params.origin
