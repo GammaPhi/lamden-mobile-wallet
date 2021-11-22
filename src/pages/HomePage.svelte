@@ -38,16 +38,17 @@ const extractBaseUrlFromOrigin = (origin) => {
 }
 
 const getShouldAutoApproveHash = () => {
-    return (
-        localStorage.getItem('autoApprove') ||
-        sessionStorage.getItem('autoApprove') ||
-        {}
+    return JSON.parse(
+        localStorage.getItem('autoApproveHash') ||
+        sessionStorage.getItem('autoApproveHash') ||
+        '{}'
     )
 };
 
 const setShouldAutoApproveHash = (hash) => {
-    localStorage.setItem('autoApprove', hash);
-    sessionStorage.setItem('autoApprove', hash);
+    let stringified = JSON.stringify(hash);
+    localStorage.setItem('autoApproveHash', stringified);
+    sessionStorage.setItem('autoApproveHash', stringified);
 }
 
 const logout = () => {
@@ -86,7 +87,6 @@ const approve = () => {
             lamdenBalanceToggle.set(!$lamdenBalanceToggle);
             if (tx.resultInfo.type === 'error') {
                 errors.set(tx.resultInfo.errorInfo);
-                return;
             }
         };
 
