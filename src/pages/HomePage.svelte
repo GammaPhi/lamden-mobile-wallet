@@ -110,6 +110,11 @@ loggedInEvent.on('loggedIn', () => {
     if (params.origin && params.type && params.type==='login') {
         approvalDetails.set(params)
         let baseOrigin = extractBaseUrlFromOrigin(params.origin);
+        if ($autoConfirm) {
+            shouldAutoApproveHash[baseOrigin] = true;
+            localStorage.setItem('autoApprove', shouldAutoApproveHash);
+            sessionStorage.setItem('autoApprove', shouldAutoApproveHash);
+        }
         if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
             // auto approve
             setTimeout(()=>{
