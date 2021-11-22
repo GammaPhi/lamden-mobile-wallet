@@ -28,7 +28,7 @@ const passwordConfirm = writable('');
         type="password"
         autoComplete="new-password"
         value={$passwordConfirm}
-        onClick={passwordConfirm}
+        onClick={passwordConfirm.set}
         />
         <div>
         If you forget your password you will need to restore your wallet using
