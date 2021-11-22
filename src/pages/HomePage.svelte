@@ -81,6 +81,7 @@ const approve = () => {
                     txCheckLimit: tx.txCheckLimit,
                     type: tx.type,
                     name: tx.name,
+                    uid: params.uid
                 },
                 params.origin
             );
