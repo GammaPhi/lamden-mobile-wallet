@@ -14,11 +14,16 @@ import BN from 'bignumber.js'
 let errors = writable([]);
 const approvalDetails = writable(null);
 let autoConfirm = writable(false);
+let lamdenBalanceToggle = writable(false);
 
-let lamdenBalance = derived([storedWallet, networkInfo],
-     async ([$storedWallet, $networkInfo], set) => {
-        if ($storedWallet && $networkInfo && $storedWallet.vk) {
-            set(await checkLamdenBalance());
+let lamdenBalance = derived([storedWallet, networkInfo, lamdenBalanceToggle],
+     async ([$storedWallet, $networkInfo, $lamdenBalanceToggle], set) => {
+        if ($lamdenBalanceToggle || !$lamdenBalanceToggle) {
+            if ($storedWallet && $networkInfo && $storedWallet.vk) {
+                set(await checkLamdenBalance());
+            } else {
+                set(BN(0));
+            }
         } else {
             set(BN(0));
         }
@@ -78,6 +83,7 @@ const approve = () => {
                 },
                 params.origin
             );
+            lamdenBalanceToggle.set(!$lamdenBalanceToggle);
             if (tx.resultInfo.type === 'error') {
                 errors.set(tx.resultInfo.errorInfo);
                 return;
@@ -97,10 +103,12 @@ const approve = () => {
         let baseOrigin = extractBaseUrlFromOrigin(params.origin);
         console.log("Base origin: "+baseOrigin);
         const shouldAutoApproveHash = getShouldAutoApproveHash();
+        console.log("Before: "+JSON.stringify(shouldAutoApproveHash));
         if ($autoConfirm) {
             shouldAutoApproveHash[baseOrigin] = true;
             setShouldAutoApproveHash(shouldAutoApproveHash);
         }
+        console.log("After: "+JSON.stringify(shouldAutoApproveHash));
         sendTransactionResponse(
             {"vk": $storedWallet.vk, "type": "vk"},
             params.origin
