@@ -25,6 +25,26 @@ let lamdenBalance = derived([storedWallet, networkInfo],
     }
 )
 
+const extractBaseUrlFromOrigin = (origin) => {
+    var pathArray = origin.split( '/' );
+    var protocol = pathArray[0];
+    var host = pathArray[2];
+    return protocol + '//' + host;
+}
+
+const getShouldAutoApproveHash = () => {
+    return (
+        localStorage.getItem('autoApprove') ||
+        sessionStorage.getItem('autoApprove') ||
+        {}
+    )
+};
+
+const setShouldAutoApproveHash = (hash) => {
+    localStorage.setItem('autoApprove', hash);
+    sessionStorage.setItem('autoApprove', hash);
+}
+
 const logout = () => {
     lockWallet();
 }
@@ -74,6 +94,13 @@ const approve = () => {
             );
         }, 50);
     } else if (params.type === 'login') {
+        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
+        console.log("Base origin: "+baseOrigin);
+        const shouldAutoApproveHash = getShouldAutoApproveHash();
+        if ($autoConfirm) {
+            shouldAutoApproveHash[baseOrigin] = true;
+            setShouldAutoApproveHash(shouldAutoApproveHash);
+        }
         sendTransactionResponse(
             {"vk": $storedWallet.vk, "type": "vk"},
             params.origin
@@ -92,30 +119,16 @@ const reject = () => {
     approvalDetails.set(null);
 }
 
-const extractBaseUrlFromOrigin = (origin) => {
-    var pathArray = origin.split( '/' );
-    var protocol = pathArray[0];
-    var host = pathArray[2];
-    return protocol + '//' + host;
-}
-
 loggedInEvent.on('loggedIn', () => {
     const params = parseParams(window.location.search);
     console.log(params);
-    const shouldAutoApproveHash = (
-        localStorage.getItem('autoApprove') ||
-        sessionStorage.getItem('autoApprove') ||
-        {}
-    )
+    const shouldAutoApproveHash = getShouldAutoApproveHash();
+
     if (params.origin && params.type && params.type==='login') {
         approvalDetails.set(params)
         let baseOrigin = extractBaseUrlFromOrigin(params.origin);
-        if ($autoConfirm) {
-            shouldAutoApproveHash[baseOrigin] = true;
-            localStorage.setItem('autoApprove', shouldAutoApproveHash);
-            sessionStorage.setItem('autoApprove', shouldAutoApproveHash);
-        }
-        if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
+        console.log("Base origin: "+baseOrigin);
+        if (shouldAutoApproveHash[baseOrigin] === true) {
             // auto approve
             setTimeout(()=>{
                 approve();
@@ -133,7 +146,8 @@ loggedInEvent.on('loggedIn', () => {
     ) {
         approvalDetails.set(params)
         let baseOrigin = extractBaseUrlFromOrigin(params.origin);
-        if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
+        console.log("Base origin: "+baseOrigin);
+        if (shouldAutoApproveHash[baseOrigin] === true) {
             // auto approve
             setTimeout(()=>{
                 approve();
@@ -178,6 +192,7 @@ loggedInEvent.on('loggedIn', () => {
             {/if}
         <Container>
             <Button 
+                color="cancel"
                 onClick={reject}
             >
                 Reject

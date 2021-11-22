@@ -38,7 +38,7 @@ import { onMount } from 'svelte';
     onClick={(wallet)=>selectedWallet.set(wallet)}
   />
   <Container>
-    <Button onClick={goBack}>Back</Button>
+    <Button color="cancel" onClick={goBack}>Back</Button>
     <Button disabled={$selectedWallet === null} color="primary" onClick={submit}>
       Restore
     </Button>

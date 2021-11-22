@@ -130,7 +130,7 @@ const onNextButtonClick = () => {
 
       </Container>
       <Container>
-        <Button onClick={goBack}>Cancel</Button>
+        <Button color="cancel" onClick={goBack}>Cancel</Button>
         <Button
           color="primary"
           disabled={!$isNextBtnEnabled}

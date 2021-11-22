@@ -37,6 +37,11 @@
     button:focus {
         border-color: #666;
     }
+
+    button.cancel {
+        color: white;
+        background-color: var(--color-gray-4);
+    }
 </style>
 
 <button disabled={disabled} class={color} on:click={onClick}><slot></slot></button>

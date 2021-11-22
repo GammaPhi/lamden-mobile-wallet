@@ -36,7 +36,7 @@ const passwordConfirm = writable('');
         </div>
     </Container>
     <Container>
-        <Button onClick={goBack}>Back</Button>
+        <Button color="cancel" onClick={goBack}>Back</Button>
         <Button
         color="primary"
         disabled={$password.length === 0 || $password !== $passwordConfirm}
