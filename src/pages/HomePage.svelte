@@ -144,6 +144,21 @@ loggedInEvent.on('loggedIn', () => {
             }, 10);            
         }
 
+        const eventHandler = (event) => {
+            if (event.origin !== params.origin)
+                return;
+            console.log(event.data);
+            approvalDetails.set(event.data);
+            const _shouldAutoApproveHash = getShouldAutoApproveHash();
+            if (_shouldAutoApproveHash[baseOrigin] === true) {
+                // auto approve
+                setTimeout(()=>{
+                    approve();
+                }, 10);            
+            }
+        };
+        window.addEventListener("message", eventHandler, false);
+
     } else if (
         params.contractName
         && params.methodName
