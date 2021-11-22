@@ -64,7 +64,7 @@ const onNextButtonClick = () => {
           <Link
             onClick={()=>useMnemonic.set(false)}
           >
-          Restore walet using a private key
+          Restore wallet using a private key
           </Link>
           <br/>
           <p>
@@ -89,7 +89,7 @@ const onNextButtonClick = () => {
           <Link
             onClick={()=>useMnemonic.set(true)}
           >
-          Restore walet using a seed phrase
+          Restore wallet using a seed phrase
           </Link>
           <br/>
 
