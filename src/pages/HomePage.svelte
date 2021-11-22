@@ -132,6 +132,7 @@ loggedInEvent.on('loggedIn', () => {
         && params.type ==='sign'
     ) {
         approvalDetails.set(params)
+        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
         if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
             // auto approve
             setTimeout(()=>{
