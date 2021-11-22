@@ -13,6 +13,7 @@ import BN from 'bignumber.js'
 
 let errors = writable([]);
 const approvalDetails = writable(null);
+let autoConfirm = writable(false);
 
 let lamdenBalance = derived([storedWallet, networkInfo],
      async ([$storedWallet, $networkInfo], set) => {
@@ -80,7 +81,6 @@ const approve = () => {
     }
     history.pushState({}, '', window.location.pathname);
     approvalDetails.set(null);
-    window.close();
 }
 
 const reject = () => {
@@ -90,14 +90,33 @@ const reject = () => {
     )
     history.pushState({}, '', window.location.pathname);
     approvalDetails.set(null);
-    window.close();
+}
+
+const extractBaseUrlFromOrigin = (origin) => {
+    var pathArray = origin.split( '/' );
+    var protocol = pathArray[0];
+    var host = pathArray[2];
+    return protocol + '//' + host;
 }
 
 loggedInEvent.on('loggedIn', () => {
     const params = parseParams(window.location.search);
     console.log(params);
+    const shouldAutoApproveHash = (
+        localStorage.getItem('autoApprove') ||
+        sessionStorage.getItem('autoApprove') ||
+        {}
+    )
     if (params.origin && params.type && params.type==='login') {
         approvalDetails.set(params)
+        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
+        if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
+            // auto approve
+            setTimeout(()=>{
+                approve();
+            }, 10);            
+        }
+
     } else if (
         params.contractName
         && params.methodName
@@ -108,6 +127,12 @@ loggedInEvent.on('loggedIn', () => {
         && params.type ==='sign'
     ) {
         approvalDetails.set(params)
+        if (shouldAutoApproveHash.hasOwnProperty(baseOrigin) && shouldAutoApproveHash[baseOrigin] === true) {
+            // auto approve
+            setTimeout(()=>{
+                approve();
+            }, 10);            
+        }
     }
     console.log('Logged in!');
 });
@@ -134,6 +159,14 @@ loggedInEvent.on('loggedIn', () => {
         {#if $approvalDetails !== null} 
             {#if $approvalDetails.type === 'login'}
             <p>Are you sure you want to login?</p>
+            <p>
+                Auto-approve transactions from this site
+                <input 
+                    type="checkbox"
+                    checked={$autoConfirm}
+                    on:change={(e) => autoConfirm.set(e.target.checked)}
+                />
+            </p>
             {:else if $approvalDetails.type === 'sign'}
             <p>Are you sure you want to sign this transaction?</p>
             {/if}
