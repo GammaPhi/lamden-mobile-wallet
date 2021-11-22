@@ -80,6 +80,7 @@ const approve = () => {
     }
     history.pushState({}, '', window.location.pathname);
     approvalDetails.set(null);
+    window.close();
 }
 
 const reject = () => {
@@ -89,6 +90,7 @@ const reject = () => {
     )
     history.pushState({}, '', window.location.pathname);
     approvalDetails.set(null);
+    window.close();
 }
 
 loggedInEvent.on('loggedIn', () => {
