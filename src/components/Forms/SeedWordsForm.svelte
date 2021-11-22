@@ -38,8 +38,9 @@ const verifyMnemonic = () => {
         margin-right: auto;
         max-width: 400px;
         font-weight: bold;
-        border: 2px solid var(--primary-color);
+        border: 2px solid var(--accent-color);
         border-radius: 5px;
+        padding: 5px;
     }
 </style>
 

@@ -10,6 +10,7 @@ import { parseParams } from '../utils/utils'
 import { sendTransaction, checkLamdenBalance, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
 import { writable, derived } from 'svelte/store';
 import BN from 'bignumber.js'
+import Copy from '../components/Core/Copy.svelte';
 
 let errors = writable([]);
 const approvalDetails = writable(null);
@@ -200,6 +201,7 @@ loggedInEvent.on('loggedIn', () => {
         >
         {shortenAddress($storedWallet.vk)}
         </a>
+        <Copy text={$storedWallet.vk} />
         <br />
         <p>Balance: {$lamdenBalance} TAU</p>
         {#if $approvalDetails !== null} 

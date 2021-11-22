@@ -5,7 +5,6 @@ html, body {
 }
 
 body {
-	color: #333;
 	margin: 0;
 	padding: 8px;
 	box-sizing: border-box;
@@ -43,23 +42,28 @@ body {
 	--success-color: #31ce31;
 	--success-color-dark: #159415;
 	--success-color-darker: #003100;
+	color: var(--font-primary);
+	background-color: var(--bg-primary);
 }
 
 a {
-	color: rgb(0,100,200);
+	color: var(--accent-color);
 	text-decoration: none;
+	border-bottom: 2px solid var(--accent-color)
 }
 
 a:hover {
-	text-decoration: underline;
+	border-bottom: 3px solid var(--accent-color)
 }
 
 a:visited {
-	color: rgb(0,80,160);
+	color: var(--accent-color-dark);
 }
 
 label {
 	display: block;
+	line-height: 1.5rem;
+	font-weight: bold;
 }
 
 input, button, select, textarea {

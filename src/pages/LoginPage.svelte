@@ -27,13 +27,13 @@ const showLoginForm = hasWallet();
       <Link onClick={() => create.set(false)} >
         Login
       </Link>
-      <br />
+      <br /><br />
       {/if}
       {#if showLoginForm && !$create}
       <Link onClick={() => create.set(true)} >
         Create new wallet
       </Link>
-      <br />
+      <br /><br/>
       {/if}      
       <Link onClick={() => restore.set(true)} >
         Restore existing wallet
