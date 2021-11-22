@@ -1,10 +1,10 @@
 {
-  "name": "svelte-app",
+  "name": "lamden-mobile-wallet",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "rollup -c",
-    "dev": "HOST=0.0.0.0 PORT=6000 rollup -c -w",
+    "dev": "HOST=0.0.0.0 PORT=5001 rollup -c -w",
     "start": "sirv public --no-clear"
   },
   "devDependencies": {
@@ -20,16 +20,6 @@
     "@rollup/plugin-replace": "^2.4.0",
     "@rollup/plugin-typescript": "^6.0.0",
     "@rollup/plugin-url": "^5.0.0",
-    "@smui/button": "^6.0.0-beta.2",
-    "@smui/card": "^6.0.0-beta.2",
-    "@smui/checkbox": "^6.0.0-beta.2",
-    "@smui/common": "^6.0.0-beta.2",
-    "@smui/dialog": "^6.0.0-beta.2",
-    "@smui/form-field": "^6.0.0-beta.2",
-    "@smui/layout-grid": "^6.0.0-beta.2",
-    "@smui/list": "^6.0.0-beta.2",
-    "@smui/select": "^6.0.0-beta.2",
-    "@smui/textfield": "^6.0.0-beta.2",
     "@tsconfig/svelte": "^1.0.10",
     "@types/compression": "^1.7.0",
     "@types/node": "^14.11.1",

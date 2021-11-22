@@ -1,7 +1,6 @@
 <script>
 export let onClick, type="text", autoComplete="", value="", onEnterButton=null, label=null;
 const submitOnEnter = (e) => {
-    console.log(e.code);
     if (e.code === "Enter" || e.code === "NumpadEnter") {
         if (onEnterButton !== null) {
             e.preventDefault();

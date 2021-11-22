@@ -7,37 +7,30 @@ import Button from '../components/Core/Button.svelte';
 import { lockWallet } from '../utils/wallet-seed'
 import { onMount } from 'svelte';
 import { parseParams } from '../utils/utils'
-import { sendTransaction, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
-import { writable } from 'svelte/store';
+import { sendTransaction, checkLamdenBalance, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
+import { writable, derived } from 'svelte/store';
+import BN from 'bignumber.js'
 
 let errors = writable([]);
+const approvalDetails = writable(null);
+
+let lamdenBalance = derived([storedWallet, networkInfo],
+     async ([$storedWallet, $networkInfo], set) => {
+        if ($storedWallet && $networkInfo && $storedWallet.vk) {
+            set(await checkLamdenBalance());
+        } else {
+            set(BN(0));
+        }
+    }
+)
 
 const logout = () => {
     lockWallet();
 }
 
-loggedInEvent.on('loggedIn', () => {
-    const params = parseParams(window.location.search);
-    console.log(params);
-    if (params.origin && params.type && params.type==='login') {
-        sendTransactionResponse(
-            {"vk": $storedWallet.vk, "type": "vk"},
-            params.origin
-        )
-    }
-
-    if (
-        params.contractName
-        && params.methodName
-        && params.kwargs
-        && params.stampLimit
-        && params.origin
-        && params.type
-        && params.type ==='sign'
-    ) {
-        let network = params.network || $selectedNetwork;
-        selectedNetwork.set(network);
-
+const approve = () => {
+    let params = $approvalDetails;
+    if (params.type === 'sign') {
         const callback = (response, tx) => {
             console.log(response);
             console.log(tx);
@@ -67,9 +60,7 @@ loggedInEvent.on('loggedIn', () => {
             if (tx.resultInfo.type === 'error') {
                 errors.set(tx.resultInfo.errorInfo);
                 return;
-            }           
-            // if not error
-            window.close();
+            }
         };
 
         setTimeout(() =>{
@@ -81,11 +72,51 @@ loggedInEvent.on('loggedIn', () => {
                 callback
             );
         }, 50);
+    } else if (params.type === 'login') {
+        sendTransactionResponse(
+            {"vk": $storedWallet.vk, "type": "vk"},
+            params.origin
+        )
+    }
+    history.pushState({}, '', window.location.pathname);
+    approvalDetails.set(null);
+}
+
+const reject = () => {
+    sendTransactionResponse(
+        {"status": "rejected"},
+        $approvalDetails.origin
+    )
+    history.pushState({}, '', window.location.pathname);
+    approvalDetails.set(null);
+}
+
+loggedInEvent.on('loggedIn', () => {
+    const params = parseParams(window.location.search);
+    console.log(params);
+    if (params.origin && params.type && params.type==='login') {
+        approvalDetails.set(params)
+    } else if (
+        params.contractName
+        && params.methodName
+        && params.kwargs
+        && params.stampLimit
+        && params.origin
+        && params.type
+        && params.type ==='sign'
+    ) {
+        approvalDetails.set(params)
     }
     console.log('Logged in!');
 });
 
 </script>
+
+<Container>
+    <h2>
+        My Lamden Wallet
+    </h2>
+</Container>
 
 <Container>
     {#if $loggedIn}
@@ -97,6 +128,26 @@ loggedInEvent.on('loggedIn', () => {
         {shortenAddress($storedWallet.vk)}
         </a>
         <br />
+        <p>Balance: {$lamdenBalance} TAU</p>
+        {#if $approvalDetails !== null} 
+            {#if $approvalDetails.type === 'login'}
+            <p>Are you sure you want to login?</p>
+            {:else if $approvalDetails.type === 'sign'}
+            <p>Are you sure you want to sign this transaction?</p>
+            {/if}
+        <Container>
+            <Button 
+                onClick={reject}
+            >
+                Reject
+            </Button>   
+            <Button 
+                onClick={approve}
+            >
+                Approve
+            </Button>   
+        </Container>
+        {/if}
         {#each $errors as error}
         <p class="bold red">
             {error}

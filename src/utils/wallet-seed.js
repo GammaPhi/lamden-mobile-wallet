@@ -4,6 +4,8 @@ import bs58 from 'bs58';
 import { Buffer } from 'buffer';
 import { storedWallet, EMPTY_WALLET } from '../stores/globalStore'
 import pbkdf2 from 'pbkdf2';
+import { getVkFromSk } from './walletProvider/lamdenProvider'
+
 
 const EXPIRATION_TIME_MS = 60 * 60 * 1000;
 
@@ -74,6 +76,14 @@ function setUnlockedWallet(
     localStorage.setItem('unlockedExpiration', expiration);
     sessionStorage.setItem('unlockedExpiration', expiration);  
   }
+}
+
+export async function storeWalletFromSk(sk, password) {
+    wallet = {
+      sk: sk,
+      vk: getVkFromSk(sk)
+    }
+    await storeWallet(wallet, password);
 }
 
 export async function storeWallet(
