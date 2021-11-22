@@ -145,7 +145,8 @@ loggedInEvent.on('loggedIn', () => {
         }
 
         const eventHandler = (event) => {
-            if (event.origin !== params.origin)
+            console.log("Received event from origin: "+event.origin);
+            if (extractBaseUrlFromOrigin(event.origin) !== baseOrigin)
                 return;
             console.log(event.data);
             approvalDetails.set(event.data);
