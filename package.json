@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
-    "dev": "HOST=0.0.0.0 PORT=5001 rollup -c -w",
-    "start": "sirv public --no-clear"
+    "dev": "HOST=0.0.0.0 PORT=5001 rollup -c -w -s",
+    "start": "sirv public --no-clear -s"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

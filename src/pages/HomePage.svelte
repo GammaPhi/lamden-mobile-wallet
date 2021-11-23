@@ -1,21 +1,23 @@
 <script>
 import Container from '../components/Core/Container.svelte';
-import { loggedInEvent, loggedIn, storedWallet, networkInfo, selectedNetwork } from '../stores/globalStore'
+import { loggedInEvent, loggedIn, storedWallet, networkInfo, lamdenBalanceToggle } from '../stores/globalStore'
 import LoginPage from './LoginPage.svelte';
 import { shortenAddress } from '../utils/utils';
 import Button from '../components/Core/Button.svelte';
-import { lockWallet } from '../utils/wallet-seed'
-import { onMount } from 'svelte';
+import { lockWallet, forgetWallet } from '../utils/wallet-seed'
 import { parseParams } from '../utils/utils'
 import { sendTransaction, checkLamdenBalance, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
 import { writable, derived } from 'svelte/store';
 import BN from 'bignumber.js'
 import Copy from '../components/Core/Copy.svelte';
+import Link from '../components/Core/Link.svelte';
+import SettingsPage from './SettingsPage.svelte';
+import SendPage from './SendPage.svelte';
+import { page } from '../utils/navigation-utils'
 
 let errors = writable([]);
 const approvalDetails = writable(null);
 let autoConfirm = writable(false);
-let lamdenBalanceToggle = writable(false);
 
 let lamdenBalance = derived([storedWallet, networkInfo, lamdenBalanceToggle],
      async ([$storedWallet, $networkInfo, $lamdenBalanceToggle], set) => {
@@ -54,6 +56,12 @@ const setShouldAutoApproveHash = (hash) => {
 
 const logout = () => {
     lockWallet();
+}
+
+const forget = () => {
+    if (confirm("Are you sure?")) {
+        forgetWallet();
+    }
 }
 
 const approve = () => {
@@ -186,12 +194,15 @@ loggedInEvent.on('loggedIn', () => {
 
 </script>
 
-<Container>
-    <h2>
-        My Lamden Wallet
-    </h2>
-</Container>
+<style>
+    div.spacing {
+        margin-top: 100px;
+    }
+</style>
 
+<div class="spacing">
+
+</div>
 <Container>
     {#if $loggedIn}
         Logged in with 
@@ -204,44 +215,59 @@ loggedInEvent.on('loggedIn', () => {
         <Copy text={$storedWallet.vk} />
         <br />
         <p>Balance: {$lamdenBalance} TAU</p>
-        {#if $approvalDetails !== null} 
-            {#if $approvalDetails.type === 'login'}
-            <p>Are you sure you want to login?</p>
-            <p>
-                Auto-approve transactions from this site
-                <input 
-                    type="checkbox"
-                    checked={$autoConfirm}
-                    on:change={(e) => autoConfirm.set(e.target.checked)}
-                />
-            </p>
-            {:else if $approvalDetails.type === 'sign'}
-            <p>Are you sure you want to sign this transaction?</p>
+
+        {#if $page === '/settings'}
+            <SettingsPage />
+        {:else if $page === '/send'}
+            <SendPage />
+        {:else if $page === '/'}
+
+
+            {#if $approvalDetails !== null} 
+                {#if $approvalDetails.type === 'login'}
+                <p>Are you sure you want to login?</p>
+                <p>
+                    Auto-approve transactions from this site
+                    <input 
+                        type="checkbox"
+                        checked={$autoConfirm}
+                        on:change={(e) => autoConfirm.set(e.target.checked)}
+                    />
+                </p>
+                {:else if $approvalDetails.type === 'sign'}
+                <p>Are you sure you want to sign this transaction?</p>
+                {/if}
+                <Container>
+                    <Button 
+                        color="cancel"
+                        onClick={reject}
+                    >
+                        Reject
+                    </Button>   
+                    <Button 
+                        onClick={approve}
+                    >
+                        Approve
+                    </Button>   
+                </Container>
             {/if}
-        <Container>
-            <Button 
-                color="cancel"
-                onClick={reject}
+            {#each $errors as error}
+            <p class="bold red">
+                {error}
+            </p>
+            {/each}
+            <Link 
+                onClick={logout}
             >
-                Reject
-            </Button>   
-            <Button 
-                onClick={approve}
+                Logout
+            </Link>
+            <br /> <br />
+            <Link 
+                onClick={forget}
             >
-                Approve
-            </Button>   
-        </Container>
-        {/if}
-        {#each $errors as error}
-        <p class="bold red">
-            {error}
-        </p>
-        {/each}
-        <Button 
-            onClick={logout}
-        >
-            Log out
-        </Button>       
+                Forget Wallet
+            </Link>  
+        {/if}     
     {:else}
         <LoginPage />
     {/if}
