@@ -4,13 +4,13 @@ export const mainnet = {
     addressExplorer: "https://mainnet.lamden.io/addresses",
     network: {
         "name": "Lamden Mainnet", 
-        "hosts": ["https://proxy.gammaphi.io"], //["https://masternode-01.lamden.io"],
+        "hosts": ["https://masternode-01.lamden.io"],
         "type": "mainnet", 
         "lamden": true, 
         "currencySymbol": "TAU",
         "blockExplorer": "https://mainnet.lamden.io"
     }
-}
+} // ["https://proxy.gammaphi.io"],
 
 export const testnet = {
     apiLink: "https://testnet.lamden.io/api",
@@ -18,7 +18,7 @@ export const testnet = {
 
     network: {
         "name": "Lamden Testnet", 
-        "hosts": ["https://proxy.gammaphi.io"],//["https://testnet-master-1.lamden.io"], 
+        "hosts": ["https://testnet-master-1.lamden.io"], 
         "type": "testnet", 
         "lamden": true, 
         "currencySymbol": "dTAU",
