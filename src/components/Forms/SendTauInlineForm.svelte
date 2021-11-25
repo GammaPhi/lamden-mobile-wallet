@@ -14,6 +14,7 @@
     const address = writable('');
     const amount = writable(BN(0));
     const sending = writable(false);
+    const errors = writable([]);
 
     const isSendBtnEnabled = derived([address, amount, sending], 
             ([$address, $amount, $sending]) => {
@@ -24,34 +25,49 @@
             })
     
     const onSendButtonClick = () => {
-        if (confirm(`Are you sure you want to send ${$amount} ${token.token} to ${$address}?`)) {
+        let _amount = $amount;
+        let _address = $address;
+        let payload = {
+            amount: { __fixed__: BN(_amount).toString()},
+            to: _address
+        }
+        console.log("Payload: ");
+        console.log(payload);
+        if (confirm(`Are you sure you want to send ${_amount} ${token.token} to ${_address}?`)) {
             sending.set(true);
             sendTransaction(
                 token.contract,
                 "approve",
-                {
-                    amount: { __fixed__: BN($amount).toString()},
-                    to: $address
-                },
+                payload,
                 90,
                 (result) => {
+                    console.log("Result 1: ");
                     console.log(result);
-                    sendTransaction(
-                        token.contract,
-                        "transfer",
-                        {
-                            amount: { __fixed__: BN($amount).toString()},
-                            to: $address
-                        },
-                        90,
-                        (result) => {
-                            console.log(result);
-                            sending.set(false);
-                            amount.set(BN(0));
-                            address.set('');
-                            onFinished();
-                        }
-                    )
+                    if (result.errors && result.errors.length > 0) {
+                        errors.set(result.errors);
+                        sending.set(false);
+                    } else {
+                        sendTransaction(
+                            token.contract,
+                            "transfer",
+                            payload,
+                            90,
+                            (result) => {
+                                console.log("Result 2: ");
+                                console.log(result);
+                                if (result.errors && result.errors.length > 0) {
+                                    errors.set(result.errors);
+                                    sending.set(false);
+                                } else {
+                                    console.log(result);
+                                    sending.set(false);
+                                    amount.set(BN(0));
+                                    address.set('');
+                                    onFinished();
+                                }
+                            }
+                        )
+                    }
                 }
             )
         }
@@ -80,6 +96,13 @@
     />
     </label>
 
+    </Container>
+    <Container>
+        {#each $errors as error}
+        <p class="bold red">
+            {error}
+        </p>
+        {/each}
     </Container>
     <Container>
     <Button color="cancel" onClick={onCancelButtonClick}>Cancel</Button>

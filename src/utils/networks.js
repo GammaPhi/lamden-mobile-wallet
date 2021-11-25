@@ -15,7 +15,6 @@ export const mainnet = {
 export const testnet = {
     apiLink: "https://testnet.lamden.io/api",
     addressExplorer: "https://testnet.lamden.io/addresses",
-
     network: {
         "name": "Lamden Testnet", 
         "hosts": ["https://testnet-master-1.lamden.io"], 

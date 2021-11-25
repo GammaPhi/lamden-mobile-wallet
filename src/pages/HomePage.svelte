@@ -15,6 +15,7 @@ import { page } from '../utils/navigation-utils'
 import AccountsPage from './AccountsPage.svelte';
 import ConnectionsPage from './ConnectionsPage.svelte';
 import Balances from '../components/Balances.svelte';
+import NetworkSelector from '../components/Forms/NetworkSelector.svelte'
 
 let errors = writable([]);
 const approvalDetails = writable(null);
@@ -156,6 +157,8 @@ loggedInEvent.on('loggedIn', () => {
 </div>
 <Container>
     {#if $loggedIn}                
+        <NetworkSelector />
+        <br /><br /><br />
         Logged in with 
         <a 
             href="{$networkInfo.addressExplorer}/{$storedWallet.vk}"
@@ -164,7 +167,6 @@ loggedInEvent.on('loggedIn', () => {
         {shortenAddress($storedWallet.vk)}
         </a>
         <Copy text={$storedWallet.vk} />
-
         {#if $page === '/accounts'}
             <AccountsPage />
         {:else if $page === '/connections'}
