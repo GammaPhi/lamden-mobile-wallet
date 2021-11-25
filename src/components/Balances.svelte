@@ -72,7 +72,7 @@ const refresh = async () => {
                 <td class="fourth">
                     <i 
                     class="fas fa-paper-plane"
-                    on:click={()=>{token['displaySend']=!token['displaySend']}}
+                    on:click={()=>{$tokens.forEach((t)=>t['displaySend']=false); token['displaySend']=true;}}
                     />                        
                 </td>
             </tr>
@@ -81,6 +81,7 @@ const refresh = async () => {
                 <td colspan="4" class="inline-form">
                     <SendTauInlineForm 
                     onCancelButtonClick={()=>{token['displaySend']=false;}}
+                    onFinished={()=>{refresh()}}
                     token={token}
                     />
                 </td>

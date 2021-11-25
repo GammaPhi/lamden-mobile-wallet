@@ -225,3 +225,11 @@ table {
 	max-width: 400px;
 	border-radius: 5px;
 }
+
+i {
+	cursor: pointer;
+}
+
+i:hover {
+	color: var(--accent-color)
+}

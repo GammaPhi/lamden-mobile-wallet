@@ -5,7 +5,7 @@
     import BN from 'bignumber.js'
     import { sendTransaction } from '../../utils/walletProvider/lamdenProvider'
 
-    export let onCancelButtonClick, token;
+    export let onCancelButtonClick, token, onFinished;
 
     const validateVk = (k) => {
       return k.length === 64;
@@ -49,7 +49,7 @@
                             sending.set(false);
                             amount.set(BN(0));
                             address.set('');
-                            alert("Success!");
+                            onFinished();
                         }
                     )
                 }
