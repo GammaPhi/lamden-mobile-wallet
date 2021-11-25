@@ -18,7 +18,7 @@ export const testnet = {
 
     network: {
         "name": "Lamden Testnet", 
-        "hosts": ["https://proxy.gammaphi.io"],//["https://testnet-master-1.lamden.io"], 
+        "hosts": ["https://testnet-master-1.lamden.io"], 
         "type": "testnet", 
         "lamden": true, 
         "currencySymbol": "dTAU",
