@@ -8,12 +8,13 @@ import Refresh from './Core/Refresh.svelte';
 import SendTauInlineForm from './Forms/SendTauInlineForm.svelte';
 import PHI from './Tokens/Token_PHI.svelte'
 import TAU from './Tokens/Token_TAU.svelte'
+import { networkInfo, networkChangedEvent } from '../stores/globalStore';
 
 const TOKENS = [
     {
         name: 'Lamden',
         contract: 'currency',
-        token: 'TAU',
+        token: "TAU",
         logo: TAU,
         precision: 4,
         displaySend: false
@@ -29,16 +30,19 @@ const TOKENS = [
 ]
 
 const tokens = writable(TOKENS);
-const showSendForm = writable({});
 
 onMount(async () => {
     await refresh();
+    networkChangedEvent.on("networkChanged", refresh);
 });
 
 const refresh = async () => {
     let _tokens = TOKENS.map((v)=>v);
     for (var i = 0; i < _tokens.length; i++) {
         var token = _tokens[i];
+        if (token.name === 'Lamden') {
+            token.token = $networkInfo.network.currencySymbol;
+        }
         var amount = await checkTokenBalance(token.contract);
         token.balance = stringToFixed(amount, token.precision);
     }

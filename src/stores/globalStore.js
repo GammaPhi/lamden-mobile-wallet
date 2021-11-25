@@ -6,6 +6,10 @@ class LoggedInEventEmitter extends EventEmitter {}
 
 export const loggedInEvent = new LoggedInEventEmitter();
 
+class NetworkChangedEventEmitter extends EventEmitter {}
+
+export const networkChangedEvent = new NetworkChangedEventEmitter();
+
 export const EMPTY_WALLET = {
     mnemonic: null,
     derivationIndex: null,
@@ -23,5 +27,5 @@ export const loggedIn = derived(storedWallet, ($storedWallet)=>{
     }
 });
 
-export const selectedNetwork =  writable("mainnet")
+export const selectedNetwork =  writable("mainnet") // writable("mainnet")
 export const networkInfo = derived(selectedNetwork, ($selectedNetwork) => networks[$selectedNetwork])

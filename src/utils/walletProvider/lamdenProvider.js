@@ -31,12 +31,15 @@ export function sendTransaction(
         kwargs,
         stampLimit: stampLimit,
     }
+    console.log("TxInfo: ");
     console.log(txInfo);
     let tx = new Lamden.TransactionBuilder(network, txInfo);
-    tx.events.on('response', (response) => {
 
-        if (callback) {
-            callback(response, tx);
+    tx.events.on('response', (response) => {
+        if (response.errors || response.result) {
+            if (callback) {
+                callback(response, tx);
+            }
         }
     })
     tx.send(wallet.sk).then(() => tx.checkForTransactionResult())
