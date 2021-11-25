@@ -1,58 +1,24 @@
 <script>
 import Container from '../components/Core/Container.svelte';
-import { loggedInEvent, loggedIn, storedWallet, networkInfo, lamdenBalanceToggle } from '../stores/globalStore'
+import { loggedInEvent, loggedIn, storedWallet, networkInfo } from '../stores/globalStore'
 import LoginPage from './LoginPage.svelte';
 import { shortenAddress } from '../utils/utils';
 import Button from '../components/Core/Button.svelte';
-import { lockWallet, forgetWallet } from '../utils/wallet-seed'
+import { lockWallet, forgetWallet, addOrUpdateConnection, isAutoApproved, extractBaseUrlFromOrigin } from '../utils/wallet-seed'
 import { parseParams } from '../utils/utils'
 import { sendTransaction, checkLamdenBalance, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
 import { writable, derived } from 'svelte/store';
 import BN from 'bignumber.js'
 import Copy from '../components/Core/Copy.svelte';
 import Link from '../components/Core/Link.svelte';
-import SettingsPage from './SettingsPage.svelte';
-import SendPage from './SendPage.svelte';
 import { page } from '../utils/navigation-utils'
+import AccountsPage from './AccountsPage.svelte';
+import ConnectionsPage from './ConnectionsPage.svelte';
+import Balances from '../components/Balances.svelte';
 
 let errors = writable([]);
 const approvalDetails = writable(null);
 let autoConfirm = writable(false);
-
-let lamdenBalance = derived([storedWallet, networkInfo, lamdenBalanceToggle],
-     async ([$storedWallet, $networkInfo, $lamdenBalanceToggle], set) => {
-        if ($lamdenBalanceToggle || !$lamdenBalanceToggle) {
-            if ($storedWallet && $networkInfo && $storedWallet.vk) {
-                set(await checkLamdenBalance());
-            } else {
-                set(BN(0));
-            }
-        } else {
-            set(BN(0));
-        }
-    }
-)
-
-const extractBaseUrlFromOrigin = (origin) => {
-    var pathArray = origin.split( '/' );
-    var protocol = pathArray[0];
-    var host = pathArray[2];
-    return protocol + '//' + host;
-}
-
-const getShouldAutoApproveHash = () => {
-    return JSON.parse(
-        localStorage.getItem('autoApproveHash') ||
-        sessionStorage.getItem('autoApproveHash') ||
-        '{}'
-    )
-};
-
-const setShouldAutoApproveHash = (hash) => {
-    let stringified = JSON.stringify(hash);
-    localStorage.setItem('autoApproveHash', stringified);
-    sessionStorage.setItem('autoApproveHash', stringified);
-}
 
 const logout = () => {
     lockWallet();
@@ -94,7 +60,6 @@ const approve = () => {
                 },
                 params.origin
             );
-            lamdenBalanceToggle.set(!$lamdenBalanceToggle);
             if (tx.resultInfo.type === 'error') {
                 errors.set(tx.resultInfo.errorInfo);
             }
@@ -110,16 +75,7 @@ const approve = () => {
             );
         }, 50);
     } else if (params.type === 'login') {
-        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
-        console.log("Base origin: "+baseOrigin);
-        const shouldAutoApproveHash = getShouldAutoApproveHash();
-        console.log(shouldAutoApproveHash);
-        if ($autoConfirm) {
-            console.log("Autoconfirming...");
-            shouldAutoApproveHash[baseOrigin] = true;
-            setShouldAutoApproveHash(shouldAutoApproveHash);
-        }
-        console.log(shouldAutoApproveHash);
+        addOrUpdateConnection(params.origin, $autoConfirm);
         sendTransactionResponse(
             {"vk": $storedWallet.vk, "type": "vk"},
             params.origin
@@ -141,13 +97,11 @@ const reject = () => {
 loggedInEvent.on('loggedIn', () => {
     const params = parseParams(window.location.search);
     console.log(params);
-    const shouldAutoApproveHash = getShouldAutoApproveHash();
 
     if (params.origin && params.type && params.type==='login') {
         approvalDetails.set(params)
-        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
-        console.log("Base origin: "+baseOrigin);
-        if (shouldAutoApproveHash[baseOrigin] === true) {
+
+        if (isAutoApproved(params.origin)) {
             // auto approve
             setTimeout(()=>{
                 approve();
@@ -155,13 +109,12 @@ loggedInEvent.on('loggedIn', () => {
         }
 
         const eventHandler = (event) => {
-            console.log("Received event from origin: "+event.origin);
-            if (extractBaseUrlFromOrigin(event.origin) !== baseOrigin)
+            if (extractBaseUrlFromOrigin(event.origin) !== extractBaseUrlFromOrigin(params.origin))
                 return;
+            console.log("Received event from origin: "+event.origin);
             console.log(event.data);
             approvalDetails.set(event.data);
-            const _shouldAutoApproveHash = getShouldAutoApproveHash();
-            if (_shouldAutoApproveHash[baseOrigin] === true) {
+            if (isAutoApproved(params.origin)) {
                 // auto approve
                 setTimeout(()=>{
                     approve();
@@ -180,9 +133,7 @@ loggedInEvent.on('loggedIn', () => {
         && params.type ==='sign'
     ) {
         approvalDetails.set(params)
-        let baseOrigin = extractBaseUrlFromOrigin(params.origin);
-        console.log("Base origin: "+baseOrigin);
-        if (shouldAutoApproveHash[baseOrigin] === true) {
+        if (isAutoApproved(params.origin)) {
             // auto approve
             setTimeout(()=>{
                 approve();
@@ -204,7 +155,7 @@ loggedInEvent.on('loggedIn', () => {
 
 </div>
 <Container>
-    {#if $loggedIn}
+    {#if $loggedIn}                
         Logged in with 
         <a 
             href="{$networkInfo.addressExplorer}/{$storedWallet.vk}"
@@ -213,16 +164,14 @@ loggedInEvent.on('loggedIn', () => {
         {shortenAddress($storedWallet.vk)}
         </a>
         <Copy text={$storedWallet.vk} />
-        <br />
-        <p>Balance: {$lamdenBalance} TAU</p>
 
-        {#if $page === '/settings'}
-            <SettingsPage />
-        {:else if $page === '/send'}
-            <SendPage />
+        {#if $page === '/accounts'}
+            <AccountsPage />
+        {:else if $page === '/connections'}
+            <ConnectionsPage />
+        {:else if $page === '/balances'}
+            <Balances />
         {:else if $page === '/'}
-
-
             {#if $approvalDetails !== null} 
                 {#if $approvalDetails.type === 'login'}
                 <p>Are you sure you want to login?</p>
@@ -251,11 +200,14 @@ loggedInEvent.on('loggedIn', () => {
                     </Button>   
                 </Container>
             {/if}
+            <br /><br />
             {#each $errors as error}
             <p class="bold red">
                 {error}
             </p>
             {/each}
+
+            <br /><br />
             <Link 
                 onClick={logout}
             >
@@ -266,9 +218,14 @@ loggedInEvent.on('loggedIn', () => {
                 onClick={forget}
             >
                 Forget Wallet
-            </Link>  
+            </Link>
+
         {/if}     
     {:else}
         <LoginPage />
     {/if}
 </Container>
+<div class="spacing"></div>
+<div class="spacing"></div>
+<div class="spacing"></div>
+<div class="spacing"></div>

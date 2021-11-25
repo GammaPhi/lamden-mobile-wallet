@@ -25,4 +25,3 @@ export const loggedIn = derived(storedWallet, ($storedWallet)=>{
 
 export const selectedNetwork =  writable("mainnet")
 export const networkInfo = derived(selectedNetwork, ($selectedNetwork) => networks[$selectedNetwork])
-export const lamdenBalanceToggle = writable(false);

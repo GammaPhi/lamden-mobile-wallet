@@ -74,6 +74,25 @@ export async function checkLamdenBalance() {
     }
 }
 
+export async function checkTokenBalance(token_contract) {
+    let apiLink = get(networkInfo).apiLink;
+    let wallet = get(storedWallet);
+    let vk = wallet.vk;
+    let url = `${apiLink}/states/${token_contract}/balances/${vk}`;
+    console.log(url);
+    try {
+        const res = await fetch(
+            url, {
+                method: 'GET',
+            },
+        )
+        return await getValueFromResponse(res)
+    } catch (error) {
+        console.log({error})
+        return new BN(0)
+    }
+}
+
 async function getValueFromResponse(res){
     if (res.status === 200) {
         let json = await res.json()

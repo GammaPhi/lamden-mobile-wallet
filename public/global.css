@@ -208,3 +208,28 @@ h1 {
 .border-box {
     box-sizing: border-box;
 }
+
+table, th, td {
+	border: 1px solid black;
+}
+
+td {
+	padding: 5px;
+}
+
+table {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: var(--bg-primary);
+	max-width: 400px;
+	border-radius: 5px;
+}
+
+i {
+	cursor: pointer;
+}
+
+i:hover {
+	color: var(--accent-color)
+}

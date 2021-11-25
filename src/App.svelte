@@ -36,7 +36,8 @@
 	<NavBar />
 	<main>
 		<Route path="/" component={HomePage} />
-		<Route path="/send" component={HomePage} />
-		<Route path="/settings" component={HomePage} />
+		<Route path="/balances" component={HomePage} />
+		<Route path="/accounts" component={HomePage} />
+		<Route path="/connections" component={HomePage} />
 	</main>
 </Router>

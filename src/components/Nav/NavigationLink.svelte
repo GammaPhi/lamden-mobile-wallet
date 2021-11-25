@@ -20,7 +20,7 @@
         color: var(--color-gray-4);
         text-decoration: none;
         font-size: 16px; 
-        font-weight: 800;
+        font-weight: normal;
         border-bottom: 2px solid transparent;
         margin: 0 1em;
     }
