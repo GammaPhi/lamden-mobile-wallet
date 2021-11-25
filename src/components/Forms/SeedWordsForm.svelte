@@ -41,6 +41,7 @@ const verifyMnemonic = () => {
         border: 2px solid var(--accent-color);
         border-radius: 5px;
         padding: 5px;
+        background-color: var(--bg-primary);
     }
 </style>
 

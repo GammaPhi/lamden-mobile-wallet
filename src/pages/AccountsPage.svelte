@@ -14,12 +14,11 @@ const onSaveButtonClick = () => {
 
 
 <Container>
-  <h3>
-    Manage Settings (Coming soon!)
-  </h3>
+  <h2>
+    Manage Accounts (Coming soon!)
+  </h2>
 
   <Container>
-    <Button color="cancel" onClick={navigateHome}>Cancel</Button>
     <Button
         color="primary"
         disabled={!$isSavingBtnEnabled}

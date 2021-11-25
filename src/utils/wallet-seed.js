@@ -5,7 +5,7 @@ import { Buffer } from 'buffer';
 import { storedWallet, EMPTY_WALLET } from '../stores/globalStore'
 import pbkdf2 from 'pbkdf2';
 import { getVkFromSk } from './walletProvider/lamdenProvider'
-
+import { get } from 'svelte/store';
 
 const EXPIRATION_TIME_MS = 60 * 60 * 1000;
 
@@ -155,16 +155,6 @@ export function loadWallet(password) {
 
 function deriveEncryptionKey(password, salt, iterations, digest) {
   return pbkdf2.pbkdf2Sync(password, salt, iterations, secretbox.keyLength, digest);
-  /*return new Promise((resolve, reject) =>
-    crypto.pbkdf2(
-      password,
-      salt,
-      iterations,
-      secretbox.keyLength,
-      digest,
-      (err, key) => (err ? reject(err) : resolve(key)),
-    ),
-  );*/
 }
 
 export function lockWallet() {
@@ -176,4 +166,69 @@ export function forgetWallet() {
   sessionStorage.removeItem('locked');
   setUnlockedWallet(EMPTY_WALLET);
   window.location.reload();
+}
+
+export const extractBaseUrlFromOrigin = (origin) => {
+  var pathArray = origin.split( '/' );
+  var protocol = pathArray[0];
+  var host = pathArray[2];
+  return protocol + '//' + host;
+}
+
+const setConnectionHash = (hash) => {
+  let wallet = get(storedWallet);
+  let key = "approve-"+wallet.vk.toString();
+  let stringified = JSON.stringify(hash);
+  localStorage.setItem(key, stringified);
+  sessionStorage.setItem(key, stringified);
+}
+
+const getConnectionHash = () => {
+  let wallet = get(storedWallet);
+  if (!wallet || !wallet.vk) {
+    return {};
+  }
+  let key = "approve-"+wallet.vk.toString();
+  return JSON.parse(
+      localStorage.getItem(key) ||
+      sessionStorage.getItem(key) ||
+      '{}'
+  )
+};
+
+export function isAutoApproved(origin) {
+  let baseOrigin = extractBaseUrlFromOrigin(origin);
+  let approvalHash = getConnectionHash();
+  return approvalHash[baseOrigin] === true;
+}
+
+export function addOrUpdateConnection(origin, autoApproved) {
+  if (autoApproved !== true && autoApproved !== false) {
+    throw new Error('autoApproved must be true or false.');
+  }
+  let baseOrigin = extractBaseUrlFromOrigin(origin);
+  let hash = getConnectionHash();
+  hash[baseOrigin] = autoApproved;
+  setConnectionHash(hash);
+}
+
+export function getConnections() {
+  let hash = getConnectionHash();
+  let connections = Object.keys(hash);
+  connections.sort();
+  return connections.map((x, i) => {
+    return {
+      name: x,
+      autoApproved: hash[x]
+    }
+  });
+}
+
+export function removeConnection(origin) {
+  let baseOrigin = extractBaseUrlFromOrigin(origin);
+  let hash = getConnectionHash();
+  if (hash.hasOwnProperty(baseOrigin)) {
+    delete hash[baseOrigin];
+  }
+  setConnectionHash(hash);
 }

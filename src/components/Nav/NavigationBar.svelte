@@ -4,8 +4,9 @@
   import Hamburger from "../SVG/HamburgerSVG.svelte"
   let links = [
     { name: "Home", href: "/"},
-    { name: "Send", href: "/send"},
-    { name: "Settings", href: "/settings"},
+    { name: "Balances", href: "/balances"},
+    { name: "Connections", href: "/connections"},
+    { name: "Accounts", href: "/accounts"},
   ];
 </script>
 
