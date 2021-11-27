@@ -6,7 +6,9 @@ import { writable } from "svelte/store";
 
     const clicked = writable(false);
 
-    const onClick = () => {
+    const onClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
         navigator.clipboard.writeText(text);
         clicked.set(true);
         setTimeout(() => {

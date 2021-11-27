@@ -2,6 +2,7 @@
 <script>
 import Container from "../Core/Container.svelte";
 import { shortenAddress } from '../../utils/utils';
+import Copy from "../Core/Copy.svelte";
 
 export let wallets, selectedWallet, onClick = false;
 
@@ -25,7 +26,8 @@ export let wallets, selectedWallet, onClick = false;
         on:click={onClick ? () => onClick(acc) : {}}
       />
       {shortenAddress(acc.vk.toString())}
-      </label>
+      <Copy text={acc.vk.toString()} />
+    </label>
     <br />
   {/each}
 </Container>
