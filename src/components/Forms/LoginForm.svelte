@@ -6,9 +6,15 @@ import Input from "../Core/Input.svelte";
 import { loadWallet } from '../../utils/wallet-seed'
 
 const password = writable('');
+const errors = writable([]);
 
 const submit = () => {
-  loadWallet($password);
+  try {
+    loadWallet($password);
+    errors.set([]);
+  } catch(e) {
+    errors.set(["Incorrect password"]);
+  }
 }
 
 </script>
@@ -27,6 +33,13 @@ const submit = () => {
         onEnterButton={(e)=>{password.set(e); submit();}}
     />
     </Container>
+    <Container>
+      {#each $errors as error}
+      <p class="bold red">
+          {error}
+      </p>
+      {/each}
+  </Container>
     <Container>
     <Button color="primary" onClick={submit}>
         Unlock

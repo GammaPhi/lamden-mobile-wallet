@@ -38,15 +38,12 @@ onMount(() => {
       availableWallets.push($storedWallet);
     }
     wallets.set(availableWallets);
-    console.log(availableWallets);
-    console.log($storedWallet);
 });
 
 function submit() {
   // check password
   try {
     loadWallet($password);
-    console.log("Valid password");
 
     // store wallet
     storeWallet(
@@ -58,7 +55,6 @@ function submit() {
 
   } catch (e) {
     console.log("Invalid password");
-    console.log(e);
     password.set('');
     errors.set(["Incorrect password"]);
   }
