@@ -19,14 +19,15 @@ onMount(async () => {
 const refresh = async () => {
     let _tokens = TOKENS.map((v)=>v);
     for (var i = 0; i < _tokens.length; i++) {
-        var token = _tokens[i];
+        let token = _tokens[i];
         if (token.name === 'Lamden') {
             token.token = $networkInfo.network.currencySymbol;
         }
-        var amount = await checkTokenBalance(token.contract);
-        token.balance = stringToFixed(amount, token.precision);
+        checkTokenBalance(token.contract).then((amount)=>{
+            token.balance = stringToFixed(amount, token.precision);
+            tokens.set(_tokens);
+        });
     }
-    tokens.set(_tokens);
 }
 
 </script>
@@ -90,6 +91,7 @@ const refresh = async () => {
         margin-left: 5px;
         vertical-align: middle;
         display: inline-flex;
+        padding-bottom: 5px;
     }
     td {
         text-align: left;
