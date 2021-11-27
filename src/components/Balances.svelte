@@ -6,28 +6,8 @@ import { checkTokenBalance } from '../utils/walletProvider/lamdenProvider';
 import Container from './Core/Container.svelte'
 import Refresh from './Core/Refresh.svelte';
 import SendTauInlineForm from './Forms/SendTauInlineForm.svelte';
-import PHI from './Tokens/Token_PHI.svelte'
-import TAU from './Tokens/Token_TAU.svelte'
 import { networkInfo, networkChangedEvent } from '../stores/globalStore';
-
-const TOKENS = [
-    {
-        name: 'Lamden',
-        contract: 'currency',
-        token: "TAU",
-        logo: TAU,
-        precision: 4,
-        displaySend: false
-    },
-    {
-        name: 'Gamma Phi',
-        contract: 'con_phi',
-        token: 'PHI',
-        logo: PHI,
-        precision: 4,
-        displaySend: false
-    }
-]
+import { TOKENS } from '../utils/tokens';
 
 const tokens = writable(TOKENS);
 

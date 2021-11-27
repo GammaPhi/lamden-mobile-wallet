@@ -50,8 +50,8 @@ const onNextButtonClick = () => {
 {#if $next }
     <DerivedAccounts
       goBack={() => next.set(false)}
-      mnemonic={mnemonic}
       password={password}
+      mnemonic={mnemonic}
       seed={seed}
     />
 {:else}

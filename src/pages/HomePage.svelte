@@ -97,7 +97,6 @@ const reject = () => {
 
 loggedInEvent.on('loggedIn', () => {
     const params = parseParams(window.location.search);
-    console.log(params);
 
     if (params.origin && params.type && params.type==='login') {
         approvalDetails.set(params)
@@ -141,7 +140,7 @@ loggedInEvent.on('loggedIn', () => {
             }, 10);            
         }
     }
-    console.log('Logged in!');
+
 });
 
 </script>

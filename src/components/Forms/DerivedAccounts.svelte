@@ -7,18 +7,20 @@ import { storeWallet } from '../../utils/wallet-seed'
 import { writable } from 'svelte/store';
 import { onMount } from 'svelte';
 
-  export let goBack, mnemonic, password;
+  export let goBack, mnemonic, password, selectedWalletIndex = 0;
   
   let selectedWallet = writable(null);
   let wallets = writable([]);
 
   onMount(()=>{
-    wallets.set([...Array(10)].map((_, idx) => {
+    let derivedWallets = [...Array(10)].map((_, idx) => {
       return getWalletFromMnemonic(
         $mnemonic,
         idx,
       );
-    }));
+    });
+    selectedWallet.set(derivedWallets[selectedWalletIndex]);
+    wallets.set(derivedWallets);
   })
 
   function submit() {
