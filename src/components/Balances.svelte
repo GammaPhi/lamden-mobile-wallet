@@ -33,7 +33,7 @@ const refresh = async () => {
 </script>
 
 <Container>
-    <h2>Balances <Refresh onClick={refresh}/></h2>
+    <h2>Balances <Refresh onClick={refresh} timeout={3000} /></h2>
     
     <table>
         {#each $tokens as token}
