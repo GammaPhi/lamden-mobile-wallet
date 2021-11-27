@@ -21,7 +21,7 @@ export let wallets, selectedWallet, onClick = false;
         type="radio"
         name="choice"
         id={acc.vk}
-        value={$selectedWallet===acc}
+        checked={$selectedWallet.vk===acc.vk}
         on:click={onClick ? () => onClick(acc) : {}}
       />
       {shortenAddress(acc.vk.toString())}

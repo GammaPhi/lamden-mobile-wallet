@@ -4,6 +4,7 @@ import { writable } from "svelte/store"
 import Container from "../Core/Container.svelte";
 import Input from "../Core/Input.svelte";
 import { loadWallet } from '../../utils/wallet-seed'
+
 const password = writable('');
 
 const submit = () => {

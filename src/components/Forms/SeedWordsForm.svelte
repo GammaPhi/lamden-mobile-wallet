@@ -2,11 +2,11 @@
 import { writable } from 'svelte/store'
 import Button from '../Core/Button.svelte';
 import Container from "../Core/Container.svelte";
-export let mnemonicAndSeed, goForward;
 import {
   normalizeMnemonic,
 } from '../../utils/wallet-seed';
 
+export let mnemonicAndSeed, goForward;
 
 const confirmed = writable(false);
 const downloaded = writable(false);

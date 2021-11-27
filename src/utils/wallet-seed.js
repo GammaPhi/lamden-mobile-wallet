@@ -78,15 +78,15 @@ function setUnlockedWallet(
   }
 }
 
-export async function storeWalletFromSk(sk, password) {
+export function storeWalletFromSk(sk, password) {
     wallet = {
       sk: sk,
       vk: getVkFromSk(sk)
     }
-    await storeWallet(wallet, password);
+    storeWallet(wallet, password);
 }
 
-export async function storeWallet(
+export function storeWallet(
   wallet,
   password,
 ) {
@@ -94,9 +94,10 @@ export async function storeWallet(
   if (password) {
     const salt = randomBytes(16);
     const kdf = 'pbkdf2';
-    const iterations = 100000;
-    const digest = 'SHA256';
+    const iterations = 10000;
+    const digest = 'sha512';
     const key = deriveEncryptionKey(password, salt, iterations, digest);
+
     const nonce = randomBytes(secretbox.nonceLength);
     const encrypted = secretbox(Buffer.from(plaintext), nonce, key);
     const lockedWallet = JSON.stringify({
@@ -129,7 +130,7 @@ export function hasWallet() {
 }
 
 export function loadWallet(password) {
-  const {
+  let {
     encrypted: encodedEncrypted,
     nonce: encodedNonce,
     salt: encodedSalt,
@@ -139,7 +140,9 @@ export function loadWallet(password) {
   const encrypted = bs58.decode(encodedEncrypted);
   const nonce = bs58.decode(encodedNonce);
   const salt = bs58.decode(encodedSalt);
+
   const key = deriveEncryptionKey(password, salt, iterations, digest);
+
   const plaintext = secretbox.open(encrypted, nonce, key);
   if (!plaintext) {
     throw new Error('Incorrect password');
@@ -154,7 +157,7 @@ export function loadWallet(password) {
 }
 
 function deriveEncryptionKey(password, salt, iterations, digest) {
-  return pbkdf2.pbkdf2Sync(password, salt, iterations, secretbox.keyLength, digest);
+  return new Uint8Array(pbkdf2.pbkdf2Sync(password, salt, iterations, secretbox.keyLength, digest));
 }
 
 export function lockWallet() {
