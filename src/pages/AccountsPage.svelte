@@ -9,6 +9,7 @@ import { storeWallet, loadWallet } from '../utils/wallet-seed'
 import { storedWallet, networkChangedEvent } from '../stores/globalStore';
 import { getWalletFromMnemonic } from '../utils/walletProvider/lamdenProvider'
 import Input from '../components/Core/Input.svelte';
+import { shortenAddress } from '../utils/utils';
 
 const selectedWallet = writable(null);
 const wallets = writable([]);
@@ -20,6 +21,7 @@ const isSavingBtnEnabled = derived([password, selectedWallet, storedWallet],
 });
 
 const errors = writable([]);
+const success = writable(null);
 
 onMount(() => {
     selectedWallet.set($storedWallet);
@@ -42,6 +44,7 @@ onMount(() => {
 
 function submit() {
   // check password
+  success.set(null);
   try {
     loadWallet($password);
 
@@ -52,6 +55,7 @@ function submit() {
     );
     errors.set([]);
     networkChangedEvent.emit("networkChanged");
+    success.set(true);
 
   } catch (e) {
     console.log("Invalid password");
@@ -92,6 +96,11 @@ function submit() {
             {error}
         </p>
         {/each}
+        {#if $success === true && $errors.length === 0}
+        <p>
+          Successfully switched to {shortenAddress($storedWallet.vk)}
+        </p>
+        {/if}
     </Container>
     <Button
         color="primary"
