@@ -31,7 +31,7 @@ const forget = () => {
     }
 }
 
-const approve = () => {
+const approve = (updateConnection) => {
     let params = $approvalDetails;
     if (params.type === 'sign') {
         const callback = (response, tx) => {
@@ -76,7 +76,9 @@ const approve = () => {
             );
         }, 50);
     } else if (params.type === 'login') {
-        addOrUpdateConnection(params.origin, $autoConfirm);
+        if (updateConnection) {
+            addOrUpdateConnection(params.origin, $autoConfirm);
+        }
         sendTransactionResponse(
             {"vk": $storedWallet.vk, "type": "vk"},
             params.origin
@@ -102,9 +104,8 @@ loggedInEvent.on('loggedIn', () => {
         approvalDetails.set(params)
 
         if (isAutoApproved(params.origin)) {
-            // auto approve
             setTimeout(()=>{
-                approve();
+                approve(false);
             }, 10);            
         }
 
@@ -115,9 +116,8 @@ loggedInEvent.on('loggedIn', () => {
             console.log(event.data);
             approvalDetails.set(event.data);
             if (isAutoApproved(params.origin)) {
-                // auto approve
                 setTimeout(()=>{
-                    approve();
+                    approve(false);
                 }, 10);            
             }
         };
@@ -134,9 +134,8 @@ loggedInEvent.on('loggedIn', () => {
     ) {
         approvalDetails.set(params)
         if (isAutoApproved(params.origin)) {
-            // auto approve
             setTimeout(()=>{
-                approve();
+                approve(false);
             }, 10);            
         }
     }
@@ -195,7 +194,7 @@ loggedInEvent.on('loggedIn', () => {
                         Reject
                     </Button>   
                     <Button 
-                        onClick={approve}
+                        onClick={()=>approve(true)}
                     >
                         Approve
                     </Button>   
