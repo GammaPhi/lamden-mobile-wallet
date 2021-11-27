@@ -80,9 +80,9 @@ function submit() {
 
   <Container>
     <Input
-      label="Confirm Password"
+      label="Password"
       type="password"
-      autoComplete="password"
+      autoComplete="current-password"
       value={$password}
       onClick={password.set}
     />
