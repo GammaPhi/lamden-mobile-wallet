@@ -63,6 +63,7 @@ const refresh = async () => {
 
 const addTokenByContract = async () => {
     addToken($tokenContract);
+    tokenContract.set('');
     await refresh();
 }
 
