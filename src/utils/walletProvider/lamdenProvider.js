@@ -96,6 +96,71 @@ export async function checkTokenBalance(token_contract) {
     }
 }
 
+export async function loadTokenInfo(token_contract) {
+    let apiLink = get(networkInfo).apiLink;
+    let pngUrl = `${apiLink}/states/${token_contract}/metadata/token_logo_base64_png`;
+    let svgUrl = `${apiLink}/states/${token_contract}/metadata/token_logo_base64_svg`;
+    let symbolUrl = `${apiLink}/states/${token_contract}/metadata/token_symbol`;
+    let nameUrl = `${apiLink}/states/${token_contract}/metadata/token_name`;
+    let ret = {
+        contract: token_contract
+    };
+    try {
+        let res = await fetch(
+            pngUrl, {
+                method: 'GET',
+            },
+        )
+        let json = await res.json()
+        let value = json.value
+        if (value) {
+            ret['type'] = 'png';
+            ret['base64'] = value;
+        } else {
+            // try svg
+            res = await fetch(
+                svgUrl, {
+                    method: 'GET',
+                },
+            )
+            json = await res.json()
+            value = json.value
+            if (value) {
+                ret['type'] = 'svg+xml';
+                ret['base64'] = value;
+            }
+        }
+        
+    } catch (error) {
+        console.log({error})
+    }
+    try {
+        {
+            let res = await fetch(
+                nameUrl, {
+                    method: 'GET',
+                },
+            )
+            let json = await res.json()
+            ret['name'] = json.value;
+        }
+        {
+            let res = await fetch(
+                symbolUrl, {
+                    method: 'GET',
+                },
+            )
+            let json = await res.json()
+            ret['token'] = json.value;
+        }
+    } catch (error) {
+        console.log({error})
+    }
+    console.log(ret);
+    return ret;
+}
+
+
 async function getValueFromResponse(res){
     if (res.status === 200) {
         let json = await res.json()

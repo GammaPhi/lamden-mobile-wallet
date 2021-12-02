@@ -7,75 +7,153 @@ import Container from './Core/Container.svelte'
 import Refresh from './Core/Refresh.svelte';
 import SendTauInlineForm from './Forms/SendTauInlineForm.svelte';
 import { networkInfo, networkChangedEvent } from '../stores/globalStore';
-import { TOKENS } from '../utils/tokens';
+import { getTokenList, getTokenDetails, getInitialTokensDetails, addToken, removeToken } from '../utils/tokens';
+import Input from './Core/Input.svelte';
+import Button from './Core/Button.svelte';
+import TokenCustom from './Tokens/Token_Custom.svelte';
+import TokenTau from './Tokens/Token_TAU.svelte';
 
-const tokens = writable(TOKENS);
+const tokens = writable([]);
+const tokensDetails = writable({});
+const tokenContract = writable('');
+const errors = writable([]);
 
 onMount(async () => {
+    tokens.set(getTokenList());
+    tokensDetails.set(await getInitialTokensDetails());
     await refresh();
     networkChangedEvent.on("networkChanged", refresh);
 });
 
 const refresh = async () => {
-    let _tokens = TOKENS.map((v)=>v);
+    let _tokens = getTokenList();
+    let _tokensDetails = $tokensDetails;
     for (var i = 0; i < _tokens.length; i++) {
         let token = _tokens[i];
-        if (token.name === 'Lamden') {
-            token.token = $networkInfo.network.currencySymbol;
-        }
-        checkTokenBalance(token.contract).then((amount)=>{
-            token.balance = stringToFixed(amount, token.precision);
-            tokens.set(_tokens);
-        });
+        getTokenDetails(token).then((details)=>{
+            if (details.contract === 'currency') {
+                details.token = $networkInfo.network.currencySymbol;
+                details.name = 'Lamden';
+                details.type = 'svg+xml';
+                console.log(details);
+            } else if (details.contract === 'con_phi') {
+                // manually set for now
+                details.token = 'PHI';
+                details.name = 'Gamma Phi';
+                details.type = 'svg+xml'
+                details.base64 = 'PHN2ZyB3aWR0aD0iMTAwJSIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsPSIjMzcyMzc0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDguMDAwMDAwLDQwLjAwMDAwMCkgc2NhbGUoMC4wMDMyNzUsLTAuMDAzOTUxKSIgZmlsbD0iIzM3MjM3NCIgc3Ryb2tlPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yNTQwIDc4MDUgbDAgLTI4NSA3OTEgMCA3OTAgMCAtMyAtMjY3IGMtMyAtMjg5IC02IC0zMDUgLTU2IC0zMjQKLTE1IC02IC0xNjIgLTE1IC0zMjcgLTIwIC01MDAgLTE1IC04NDcgLTUyIC0xMjUwIC0xMzQgLTg3NCAtMTc1IC0xNDUyIC00NDEKLTE4MzUgLTg0MiAtMzI0IC0zMzggLTUzOSAtODA5IC02MjIgLTEzNTggLTIxIC0xNDMgLTE4IC02MDkgNiAtNzYwIDgzIC01MzQKMzA4IC0xMDA2IDY0MSAtMTM0MCAzMjMgLTMyNiA3MzMgLTU0NCAxMjgwIC02ODMgNDM4IC0xMTEgODUxIC0xNzAgMTcyNSAtMjQ3CjIyMiAtMTkgNDA4IC0zOSA0MTIgLTQzIDIxIC0yMSAyOCAtMTQ3IDI4IC01MjggbDAgLTQxNCAtNzkwIDAgLTc5MCAwIDAgLTI4MAowIC0yODAgMjM2NSAwIDIzNjUgMCAwIDI4MCAwIDI4MCAtNzk1IDAgLTc5NSAwIDAgNDczIDAgNDc0IDE5MyA3IGMzODkgMTQKOTYxIDY2IDEzMzIgMTIyIDMxMyA0NiA3NzIgMTc2IDEwNjUgMzAxIDYxNSAyNjMgMTAzNCA2NTQgMTI2NSAxMTgzIDE3MCAzODkKMjU2IDg3NCAyMjUgMTI3NSAtMzggNTA0IC0xOTcgOTYxIC00NjYgMTMzNSAtNzQgMTA0IC0yNTMgMjkxIC0zNTggMzc2IC01MjcKNDIzIC0xMzE5IDY2MCAtMjUzMSA3NTkgLTU4MyA0NyAtNjM3IDU1IC02ODIgOTcgLTM3IDM1IC00MyA4MCAtNDMgMzI2IGwwCjIzMiA3OTUgMCA3OTUgMCAwIDI4NSAwIDI4NSAtMjM2NSAwIC0yMzY1IDAgMCAtMjg1eiBtMzM2OCAtMTMyNSBjNDk1IC00OQo4MjEgLTEzMCAxMTI3IC0yODAgMzYyIC0xNzcgNjAyIC00MDcgNzcwIC03NDAgOTkgLTE5NyAxNTMgLTM2NyAxNzkgLTU3MCA0OQotMzc1IDQ1IC0xMDg2IC05IC0xNDI1IC03MCAtNDQwIC0zMTAgLTgxNyAtNjg1IC0xMDc0IC0zNTggLTI0NSAtNzY3IC0zNzUKLTEzMTAgLTQxNiAtMTA3IC04IC0yMTkgLTE3IC0yNDcgLTE5IGwtNTMgLTUgMCAyMjc1IGMwIDE2NDQgMyAyMjc0IDExIDIyNzQKNiAwIDEwNCAtOSAyMTcgLTIweiBtLTE3ODggLTIyNjUgbDAgLTIyNzYgLTMyIDUgYy0xOCAzIC05NCAxMCAtMTY4IDE2IC05MTcKNzIgLTE1MDMgMzU0IC0xODU0IDg5MiAtMTAwIDE1MyAtMTkyIDM2NiAtMjQxIDU1NSAtNTMgMjAzIC04MiA2OTQgLTY1IDExMDEKMTEgMjgwIDIyIDM3MSA2MCA1MTggMTE2IDQ0MiAzNzggODIwIDczMiAxMDU3IDM0MSAyMjggOTU5IDM5NyAxNDgxIDQwNiBsODcKMSAwIC0yMjc1eiIvPgogIDwvZz4KPC9zdmc+Cg=='
+            }
+            if (!details.name) {
+                removeToken(details.contract);
+                errors.set(['Unable to import '+details.contract+'.']);
+            } else {
+                checkTokenBalance(details.contract).then((amount)=>{
+                    console.log(details.contract);
+                    console.log("Amount: "+amount.toString());
+                    details.balance = stringToFixed(amount, details.precision || 4);
+                    _tokensDetails[details.contract] = details;
+                    tokens.set(_tokens);
+                    tokensDetails.set(_tokensDetails);                
+                });
+            }
+        })
+    }
+}
+
+const addTokenByContract = async () => {
+    addToken($tokenContract);
+    await refresh();
+}
+
+const removeTokenByContract = async (token) => {
+    if (confirm("Are you sure you want to remove the token contract "+token+"?")) {
+        removeToken(token);
+        await refresh();
     }
 }
 
 </script>
+
+
 
 <Container>
     <h2>Balances <Refresh onClick={refresh} timeout={3000} /></h2>
     
     <table>
         {#each $tokens as token}
-            <tr>
-                <td class="first">
-                    <div class="logo">
-                        <svelte:component this={token.logo} />
-                    </div>
-                </td>
-                <td class="second">
-                    <span>
-                        {token.name}
-                    </span>
-                </td>
-                <td class="third">
-                    <span>
-                    {token.balance || '-'}
-                    {token.token}        
-                    </span>
-                </td>
-                <td class="fourth">
-                    <i 
-                    class="fas fa-paper-plane"
-                    on:click={()=>{$tokens.forEach((t)=>t['displaySend']=false); token['displaySend']=true;}}
-                    />                        
-                </td>
-            </tr>
-            {#if token['displaySend']}
-            <tr>
-                <td colspan="4" class="inline-form">
-                    <SendTauInlineForm 
-                    onCancelButtonClick={()=>{token['displaySend']=false;}}
-                    onFinished={()=>{refresh()}}
-                    token={token}
-                    />
-                </td>
-            </tr>
+            {#if $tokensDetails.hasOwnProperty(token)}
+                <tr>
+                    <td class="first">
+                        <div class="logo">
+                            {#if token === 'currency'}
+                            <TokenTau />
+                            {:else}
+                            <TokenCustom 
+                                base64Image={$tokensDetails[token].base64}
+                                type={$tokensDetails[token].type} 
+                            />
+                            {/if}
+                        </div>
+                    </td>
+                    <td class="second">
+                        <span>
+                            {$tokensDetails[token].name}
+                        </span>
+                    </td>
+                    <td class="third">
+                        <span>
+                        {$tokensDetails[token].balance || '-'}
+                        {$tokensDetails[token].token}        
+                        </span>
+                    </td>
+                    <td class="fourth">
+                        <i 
+                        class="fas fa-paper-plane"
+                        on:click={()=>{$tokens.forEach((t)=>$tokensDetails[t]['displaySend']=false); $tokensDetails[token]['displaySend']=true;}}
+                        />
+                        <div
+                        class="remove"
+                            on:click={()=>removeTokenByContract(token)}
+                        >
+                        X
+                        </div>
+                    </td>
+                </tr>
+                {#if $tokensDetails[token]['displaySend']}
+                <tr>
+                    <td colspan="4" class="inline-form">
+                        <SendTauInlineForm 
+                        onCancelButtonClick={()=>{$tokensDetails[token]['displaySend']=false;}}
+                        onFinished={()=>{refresh()}}
+                        token={token}
+                        />
+                    </td>
+                </tr>
+                {/if}
             {/if}
         {/each}
     </table>
-</Container>
+    
+    <br />
+    <br />
 
+    <Input 
+        label="Add Token Contract"
+        onClick={tokenContract.set}
+        value={$tokenContract}
+        onEnterButton={addTokenByContract}
+    />
+    {#each $errors as error}
+    <p class="bold red">
+        {error}
+    </p>
+    {/each}
+    <Button
+        onClick={addTokenByContract}
+    >
+        Add
+    </Button>
+</Container>
 
 <style>
     .logo {
@@ -104,6 +182,14 @@ const refresh = async () => {
     }
     i.fa-paper-plane {
         cursor: pointer;
+    }
+
+    .remove {
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+      display: inline;
+      float: right;
     }
 </style>
 
