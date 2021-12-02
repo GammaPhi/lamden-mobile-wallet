@@ -90,22 +90,24 @@ const removeTokenByContract = async (token) => {
                             {#if token === 'currency'}
                             <TokenTau />
                             {:else}
-                            <TokenCustom 
-                                base64Image={$tokensDetails[token].base64}
-                                type={$tokensDetails[token].type} 
-                            />
+                                {#if $tokensDetails[token].type}
+                                <TokenCustom 
+                                    base64Image={$tokensDetails[token].base64}
+                                    type={$tokensDetails[token].type} 
+                                />
+                                {/if}
                             {/if}
                         </div>
                     </td>
                     <td class="second">
                         <span>
-                            {$tokensDetails[token].name}
+                            {$tokensDetails[token].name || '-'}
                         </span>
                     </td>
                     <td class="third">
                         <span>
                         {$tokensDetails[token].balance || '-'}
-                        {$tokensDetails[token].token}        
+                        {$tokensDetails[token].token || ''}        
                         </span>
                     </td>
                     <td class="fourth">
@@ -134,6 +136,12 @@ const removeTokenByContract = async (token) => {
                     </td>
                 </tr>
                 {/if}
+            {:else}
+            <tr>
+                <td colspan="4">
+                Loading...
+                </td>
+            </tr>
             {/if}
         {/each}
     </table>
