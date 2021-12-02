@@ -81,7 +81,7 @@ const removeTokenByContract = async (token) => {
     
     <table>
         {#each $tokens as token}
-            {#if $tokensDetails.hasOwnProperty(token)}
+            {#if $tokensDetails.hasOwnProperty(token) && $tokensDetails[token] !== null}
                 <tr>
                     <td class="first">
                         <div class="logo">
