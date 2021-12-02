@@ -42,7 +42,7 @@ const refresh = async () => {
                 details.name = 'Gamma Phi';
                 details.type = 'svg+xml'
                 details.base64 = 'PHN2ZyB3aWR0aD0iMTAwJSIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsPSIjMzcyMzc0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDguMDAwMDAwLDQwLjAwMDAwMCkgc2NhbGUoMC4wMDMyNzUsLTAuMDAzOTUxKSIgZmlsbD0iIzM3MjM3NCIgc3Ryb2tlPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yNTQwIDc4MDUgbDAgLTI4NSA3OTEgMCA3OTAgMCAtMyAtMjY3IGMtMyAtMjg5IC02IC0zMDUgLTU2IC0zMjQKLTE1IC02IC0xNjIgLTE1IC0zMjcgLTIwIC01MDAgLTE1IC04NDcgLTUyIC0xMjUwIC0xMzQgLTg3NCAtMTc1IC0xNDUyIC00NDEKLTE4MzUgLTg0MiAtMzI0IC0zMzggLTUzOSAtODA5IC02MjIgLTEzNTggLTIxIC0xNDMgLTE4IC02MDkgNiAtNzYwIDgzIC01MzQKMzA4IC0xMDA2IDY0MSAtMTM0MCAzMjMgLTMyNiA3MzMgLTU0NCAxMjgwIC02ODMgNDM4IC0xMTEgODUxIC0xNzAgMTcyNSAtMjQ3CjIyMiAtMTkgNDA4IC0zOSA0MTIgLTQzIDIxIC0yMSAyOCAtMTQ3IDI4IC01MjggbDAgLTQxNCAtNzkwIDAgLTc5MCAwIDAgLTI4MAowIC0yODAgMjM2NSAwIDIzNjUgMCAwIDI4MCAwIDI4MCAtNzk1IDAgLTc5NSAwIDAgNDczIDAgNDc0IDE5MyA3IGMzODkgMTQKOTYxIDY2IDEzMzIgMTIyIDMxMyA0NiA3NzIgMTc2IDEwNjUgMzAxIDYxNSAyNjMgMTAzNCA2NTQgMTI2NSAxMTgzIDE3MCAzODkKMjU2IDg3NCAyMjUgMTI3NSAtMzggNTA0IC0xOTcgOTYxIC00NjYgMTMzNSAtNzQgMTA0IC0yNTMgMjkxIC0zNTggMzc2IC01MjcKNDIzIC0xMzE5IDY2MCAtMjUzMSA3NTkgLTU4MyA0NyAtNjM3IDU1IC02ODIgOTcgLTM3IDM1IC00MyA4MCAtNDMgMzI2IGwwCjIzMiA3OTUgMCA3OTUgMCAwIDI4NSAwIDI4NSAtMjM2NSAwIC0yMzY1IDAgMCAtMjg1eiBtMzM2OCAtMTMyNSBjNDk1IC00OQo4MjEgLTEzMCAxMTI3IC0yODAgMzYyIC0xNzcgNjAyIC00MDcgNzcwIC03NDAgOTkgLTE5NyAxNTMgLTM2NyAxNzkgLTU3MCA0OQotMzc1IDQ1IC0xMDg2IC05IC0xNDI1IC03MCAtNDQwIC0zMTAgLTgxNyAtNjg1IC0xMDc0IC0zNTggLTI0NSAtNzY3IC0zNzUKLTEzMTAgLTQxNiAtMTA3IC04IC0yMTkgLTE3IC0yNDcgLTE5IGwtNTMgLTUgMCAyMjc1IGMwIDE2NDQgMyAyMjc0IDExIDIyNzQKNiAwIDEwNCAtOSAyMTcgLTIweiBtLTE3ODggLTIyNjUgbDAgLTIyNzYgLTMyIDUgYy0xOCAzIC05NCAxMCAtMTY4IDE2IC05MTcKNzIgLTE1MDMgMzU0IC0xODU0IDg5MiAtMTAwIDE1MyAtMTkyIDM2NiAtMjQxIDU1NSAtNTMgMjAzIC04MiA2OTQgLTY1IDExMDEKMTEgMjgwIDIyIDM3MSA2MCA1MTggMTE2IDQ0MiAzNzggODIwIDczMiAxMDU3IDM0MSAyMjggOTU5IDM5NyAxNDgxIDQwNiBsODcKMSAwIC0yMjc1eiIvPgogIDwvZz4KPC9zdmc+Cg=='
-            }
+            }            
             if (!details.name) {
                 removeToken(details.contract);
                 errors.set(['Unable to import '+details.contract+'.']);
@@ -51,6 +51,7 @@ const refresh = async () => {
                     console.log(details.contract);
                     console.log("Amount: "+amount.toString());
                     details.balance = stringToFixed(amount, details.precision || 4);
+                    details.displaySend = (($tokensDetails[details.contract] || {}).displaySend || false);
                     _tokensDetails[details.contract] = details;
                     tokens.set(_tokens);
                     tokensDetails.set(_tokensDetails);                
@@ -108,15 +109,9 @@ const removeTokenByContract = async (token) => {
                     </td>
                     <td class="fourth">
                         <i 
-                        class="fas fa-paper-plane"
-                        on:click={()=>{$tokens.forEach((t)=>$tokensDetails[t]['displaySend']=false); $tokensDetails[token]['displaySend']=true;}}
+                        class="fas {$tokensDetails[token]['displaySend'] ? 'fa-chevron-circle-up' : 'fa-chevron-circle-down'}"
+                        on:click={()=>{let prevState=$tokensDetails[token]['displaySend'];; $tokens.forEach((t)=>$tokensDetails[t]['displaySend']=false); $tokensDetails[token]['displaySend']=!prevState}}
                         />
-                        <div
-                        class="remove"
-                            on:click={()=>removeTokenByContract(token)}
-                        >
-                        X
-                        </div>
                     </td>
                 </tr>
                 {#if $tokensDetails[token]['displaySend']}
@@ -127,6 +122,14 @@ const removeTokenByContract = async (token) => {
                         onFinished={()=>{refresh()}}
                         token={token}
                         />
+                        {#if token !== 'currency'}
+                            <div
+                            class="remove"
+                                on:click={()=>removeTokenByContract(token)}
+                            >
+                            Remove Token Contract
+                            </div>
+                        {/if}
                     </td>
                 </tr>
                 {/if}
@@ -180,16 +183,15 @@ const removeTokenByContract = async (token) => {
     td.third {
         text-align: right;
     }
-    i.fa-paper-plane {
-        cursor: pointer;
-    }
 
     .remove {
       cursor: pointer;
       color: red;
       font-weight: bold;
-      display: inline;
-      float: right;
+      border-bottom: 2px solid red;
+      margin-left: auto;
+      margin-right: auto;
+      width: max-content;
     }
 </style>
 
