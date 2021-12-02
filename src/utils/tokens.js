@@ -1,40 +1,94 @@
-import PHI from '../components/Tokens/Token_PHI.svelte';
-import TAU from '../components/Tokens/Token_TAU.svelte';
-import LUSD from '../components/Tokens/Token_LUSD.svelte';
-import LIQ from '../components/Tokens/Token_LIQ.svelte';
+import { loadTokenInfo } from './walletProvider/lamdenProvider';
+
+const TOKENS_CONTRACTS_KEY = "lsts";
+const TOKEN_DETAILS_PREFIX = "lst001-";
 
 
-export const TOKENS = [
-    {
-        name: 'Lamden',
-        contract: 'currency',
-        token: "TAU",
-        logo: TAU,
-        precision: 4,
-        displaySend: false
-    },
-    {
-        name: 'Lamden USD',
-        contract: 'con_lusd_lst001',
-        token: "LUSD",
-        logo: LUSD,
-        precision: 4,
-        displaySend: false
-    },
-    {
-        name: 'Gamma Phi',
-        contract: 'con_phi',
-        token: 'PHI',
-        logo: PHI,
-        precision: 4,
-        displaySend: false
-    },
-    {
-        name: "Liquidus Finance",
-        contract: 'con_liquidus_lst001',
-        token: "LIQ",
-        logo: LIQ,
-        precision: 4,
-        displaySend: false
-    },
+export const DEFAULT_TOKENS = [
+    'currency',
+    'con_lusd_lst001',
+    'con_phi',
+    'con_liquidus_lst001'
 ];
+
+
+export function getTokenList() {
+    let tokens = getFromStorage(TOKENS_CONTRACTS_KEY);
+    if (!tokens) {
+        tokens = DEFAULT_TOKENS;
+        setInStorage(TOKENS_CONTRACTS_KEY, tokens);
+    }
+    return tokens;
+}
+
+export async function getInitialTokensDetails() {
+    let tokens = getTokenList();
+    let details = {};
+    for (var i = 0; i < tokens.length; i++) {
+        details[tokens[i]] = await getTokenDetails(tokens[i], false);
+    }
+    return details;
+}
+
+
+export function removeToken(token) {
+    let tokens = getTokenList();
+    let index = tokens.indexOf(token);
+    if (index > -1) {
+        tokens.splice(index, 1);
+        setInStorage(TOKENS_CONTRACTS_KEY, tokens);
+    }
+    try {
+        deleteFromStorage(TOKEN_DETAILS_PREFIX+tokenDetails.contract);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
+export async function getTokenDetails(token, fetchIfNotPresent=true) {
+    let details = getFromStorage(TOKEN_DETAILS_PREFIX+token);
+    if (!details && fetchIfNotPresent) {
+        details = await loadTokenInfo(token);
+        storeTokenDetails(details);
+    }
+    return details;
+}
+
+export function addToken(contract) {
+    let tokenContracts = getTokenList();
+    if (!tokenContracts.includes(contract)) {
+        tokenContracts.push(contract)
+        setInStorage(TOKENS_CONTRACTS_KEY, tokenContracts);
+    }
+}
+
+
+export function storeTokenDetails(tokenDetails) {
+    let tokenContracts = getTokenList();
+    if (!tokenContracts.includes(tokenDetails.contract)) {
+        tokenContracts.push(tokenDetails.contract)
+        setInStorage(TOKENS_CONTRACTS_KEY, tokenContracts);
+    }
+    setInStorage(TOKEN_DETAILS_PREFIX+tokenDetails.contract, tokenDetails);
+};
+
+
+const getFromStorage = (key) => {
+    return JSON.parse(
+        localStorage.getItem(key)
+        || sessionStorage.getItem(key)
+        || "null"
+    )
+};
+
+const setInStorage = (key, data) => {
+    let serialized = JSON.stringify(data);
+    localStorage.setItem(key, serialized);
+    sessionStorage.setItem(key, serialized);
+};
+
+const deleteFromStorage = (key) => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+};
