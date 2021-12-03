@@ -7,11 +7,12 @@ import Container from './Core/Container.svelte'
 import Refresh from './Core/Refresh.svelte';
 import SendTauInlineForm from './Forms/SendTauInlineForm.svelte';
 import { networkInfo, networkChangedEvent } from '../stores/globalStore';
-import { getTokenList, getTokenDetails, getInitialTokensDetails, addToken, removeToken } from '../utils/tokens';
+import { getTokenList,  getTokenDetails, forgetAllTokens, getInitialTokensDetails, addToken, removeToken } from '../utils/tokens';
 import Input from './Core/Input.svelte';
 import Button from './Core/Button.svelte';
 import TokenCustom from './Tokens/Token_Custom.svelte';
 import TokenTau from './Tokens/Token_TAU.svelte';
+import Link from './Core/Link.svelte';
 
 const tokens = writable([]);
 const tokensDetails = writable({});
@@ -128,7 +129,7 @@ const removeTokenByContract = async (token) => {
                         {#if token !== 'currency'}
                             <div
                             class="remove"
-                                on:click={()=>removeTokenByContract(token)}
+                                on:click={()=>{$tokensDetails[token]['displaySend']=false; removeTokenByContract(token)}}
                             >
                             Remove Token Contract
                             </div>
@@ -145,7 +146,12 @@ const removeTokenByContract = async (token) => {
             {/if}
         {/each}
     </table>
-    
+    <br />
+    <Link
+        onClick={async ()=>{if(confirm("This will reset the token list to the default. Are you sure you want to continue?")) {forgetAllTokens(); await refresh()}}}
+    >
+        Reset Token List
+    </Link>
     <br />
     <br />
 
