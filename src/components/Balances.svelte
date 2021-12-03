@@ -123,7 +123,7 @@ const removeTokenByContract = async (token) => {
                         <SendTauInlineForm 
                         onCancelButtonClick={()=>{$tokensDetails[token]['displaySend']=false;}}
                         onFinished={()=>{refresh()}}
-                        token={token}
+                        token={$tokensDetails[token]}
                         />
                         {#if token !== 'currency'}
                             <div
