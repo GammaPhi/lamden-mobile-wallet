@@ -6,6 +6,7 @@ import { storedWallet, EMPTY_WALLET } from '../stores/globalStore'
 import pbkdf2 from 'pbkdf2';
 import { getVkFromSk } from './walletProvider/lamdenProvider'
 import { get } from 'svelte/store';
+import { forgetAllTokens } from './tokens';
 
 const EXPIRATION_TIME_MS = 60 * 60 * 1000;
 
@@ -168,6 +169,7 @@ export function forgetWallet() {
   localStorage.clear();
   sessionStorage.removeItem('locked');
   setUnlockedWallet(EMPTY_WALLET);
+  forgetAllTokens();
   window.location.reload();
 }
 

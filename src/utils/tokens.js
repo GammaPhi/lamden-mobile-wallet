@@ -7,8 +7,12 @@ const TOKEN_DETAILS_PREFIX = "lst001-";
 export const DEFAULT_TOKENS = [
     'currency',
     'con_lusd_lst001',
+    'con_weth_lst001',
     'con_phi',
-    'con_liquidus_lst001'
+    'con_nebula',
+    'con_liquidus_lst001',
+    'con_uwarriors_lst001',
+    'con_marmite100_contract'
 ];
 
 
@@ -72,6 +76,14 @@ export function storeTokenDetails(tokenDetails) {
     }
     setInStorage(TOKEN_DETAILS_PREFIX+tokenDetails.contract, tokenDetails);
 };
+
+export function forgetAllTokens() {
+    let tokenContracts = getTokenList();
+    for (var i = 0; i < tokenContracts.length; i++) {
+        removeToken(tokenContracts[i]);
+    }
+    deleteFromStorage(TOKENS_CONTRACTS_KEY);
+}
 
 
 const getFromStorage = (key) => {

@@ -26,7 +26,7 @@ const logout = () => {
 }
 
 const forget = () => {
-    if (confirm("Are you sure?")) {
+    if (confirm("Are you sure you want to forget this wallet? You will not be able to recover this wallet without your seed phrase or secret key.")) {
         forgetWallet();
     }
 }
@@ -150,9 +150,6 @@ loggedInEvent.on('loggedIn', () => {
     }
 </style>
 
-<div class="spacing">
-
-</div>
 <Container>
     {#if $loggedIn}                
         <NetworkSelector />
@@ -164,7 +161,12 @@ loggedInEvent.on('loggedIn', () => {
         >
         {shortenAddress($storedWallet.vk)}
         </a>
-        <Copy text={$storedWallet.vk} />
+        <Copy text={$storedWallet.vk} /><br /><br />
+        <Link 
+            onClick={logout}
+        >
+            Logout
+        </Link>
         {#if $page === '/accounts'}
             <AccountsPage />
         {:else if $page === '/connections'}
@@ -186,6 +188,11 @@ loggedInEvent.on('loggedIn', () => {
                 {:else if $approvalDetails.type === 'sign'}
                 <p>Are you sure you want to sign this transaction?</p>
                 {/if}
+                {#each $errors as error}
+                <p class="bold red">
+                    {error}
+                </p>
+                {/each}    
                 <Container>
                     <Button 
                         color="cancel"
@@ -201,19 +208,6 @@ loggedInEvent.on('loggedIn', () => {
                 </Container>
             {/if}
             <br /><br />
-            {#each $errors as error}
-            <p class="bold red">
-                {error}
-            </p>
-            {/each}
-
-            <br /><br />
-            <Link 
-                onClick={logout}
-            >
-                Logout
-            </Link>
-            <br /> <br />
             <Link 
                 onClick={forget}
             >
