@@ -4,7 +4,7 @@ import Container from "../Core/Container.svelte";
 import { shortenAddress } from '../../utils/utils';
 import Copy from "../Core/Copy.svelte";
 
-export let wallets, selectedWallet, onClick = false;
+export let wallets, selectedWallet, onClick = false, showHeader=true, allowExportKeys=false;
 
 </script>
 
@@ -13,9 +13,11 @@ export let wallets, selectedWallet, onClick = false;
 </style>
 
 <Container>
+  {#if showHeader}
   <h4>
     Derivable Accounts
   </h4>
+  {/if}
   {#each $wallets as acc}
     <label for={acc.vk}>
     <input 

@@ -6,9 +6,8 @@ import { shortenAddress } from '../utils/utils';
 import Button from '../components/Core/Button.svelte';
 import { lockWallet, forgetWallet, addOrUpdateConnection, isAutoApproved, extractBaseUrlFromOrigin } from '../utils/wallet-seed'
 import { parseParams } from '../utils/utils'
-import { sendTransaction, checkLamdenBalance, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
-import { writable, derived } from 'svelte/store';
-import BN from 'bignumber.js'
+import { sendTransaction, sendTransactionResponse } from '../utils/walletProvider/lamdenProvider'
+import { writable } from 'svelte/store';
 import Copy from '../components/Core/Copy.svelte';
 import Link from '../components/Core/Link.svelte';
 import { page } from '../utils/navigation-utils'
@@ -16,6 +15,7 @@ import AccountsPage from './AccountsPage.svelte';
 import ConnectionsPage from './ConnectionsPage.svelte';
 import Balances from '../components/Balances.svelte';
 import NetworkSelector from '../components/Forms/NetworkSelector.svelte'
+import Export from '../components/Export.svelte';
 
 let errors = writable([]);
 const approvalDetails = writable(null);
@@ -213,7 +213,8 @@ loggedInEvent.on('loggedIn', () => {
             >
                 Forget Wallet
             </Link>
-
+            <br /><br />
+            <Export />
         {/if}     
     {:else}
         <LoginPage />

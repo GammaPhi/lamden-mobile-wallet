@@ -72,14 +72,18 @@ function submit() {
     Your Accounts
   </h2>
 
+  {#if $storedWallet.vk!== null && !$storedWallet.mnemonic}
   <p>
     Only wallets created from a Mnemonic have multiple derivable accounts.
   </p>
+  {/if}
 
   <AccountsSelector
     wallets={wallets}
     selectedWallet={selectedWallet}
     onClick={(wallet)=>selectedWallet.set(wallet)}
+    allowExportKeys={true}
+    showHeader={false}
   />
 
   <Container>
