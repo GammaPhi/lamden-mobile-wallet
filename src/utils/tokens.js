@@ -9,6 +9,7 @@ export const DEFAULT_TOKENS = [
     'con_lusd_lst001',
     'con_weth_lst001',
     'con_phi',
+    'con_rswp_lst001',
     'con_nebula',
     'con_liquidus_lst001',
     'con_uwarriors_lst001',
