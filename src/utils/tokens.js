@@ -8,7 +8,7 @@ export const DEFAULT_TOKENS = [
     'currency',
     'con_lusd_lst001',
     'con_weth_lst001',
-    'con_phi',
+    'con_phi_lst001',
     'con_rswp_lst001',
     'con_nebula',
     'con_liquidus_lst001',
